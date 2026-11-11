@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>安心规划 · Plan Ahead CT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --ink:#1f2a37; --muted:#5b6675; --line:#d9d4c7; --paper:#fbf8f2; --card:#ffffff;
+  --brand:#1d4e5f; --brand-2:#2f7a72; --accent:#b5672d; --soft:#eef4f2; --warn:#fff4e5; --warn-ink:#8a4b0f;
+  --radius:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:"Noto Sans SC",system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--paper);color:var(--ink);font-size:18px;line-height:1.7}
+a{color:var(--brand)}
+.wrap{max-width:960px;margin:0 auto;padding:0 20px}
+header.top{background:var(--brand);color:#fff}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px}
+.logo{font-family:"Noto Serif SC",serif;font-weight:700;font-size:22px;color:#fff;text-decoration:none;letter-spacing:.5px}
+.logo small{font-family:"Noto Sans SC";font-weight:400;font-size:14px;opacity:.8;margin-left:8px;letter-spacing:0}
+.top nav a{color:#fff;opacity:.9;font-size:15px;text-decoration:none}
+.en{color:var(--muted);font-size:.82em;font-weight:400}
+h1,h2,h3{font-family:"Noto Serif SC",serif;line-height:1.35;margin:0 0 .4em}
+h1{font-size:34px} h2{font-size:26px} h3{font-size:21px}
+.hero{padding:48px 0 28px}
+.hero p.lead{font-size:20px;color:#34404e;max-width:760px}
+.pill-row{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 0}
+.pill{background:var(--soft);color:var(--brand);border-radius:999px;padding:6px 14px;font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px;margin:22px 0 40px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:6px;transition:transform .12s, box-shadow .12s}
+a.card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(29,78,95,.12)}
+.card .tag{font-size:13px;color:var(--brand-2);font-weight:500}
+.card h3{margin:0}
+.card p{margin:0;color:#3e4a58;font-size:16px}
+.card .go{margin-top:auto;padding-top:8px;color:var(--accent);font-weight:500;font-size:16px}
+section.block{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px;margin:0 0 22px}
+.callout{background:var(--warn);color:var(--warn-ink);border-radius:10px;padding:14px 18px;margin:14px 0;font-size:16px}
+.callout.ok{background:var(--soft);color:var(--brand)}
+.steps-list{counter-reset:s;list-style:none;padding:0;margin:10px 0}
+.steps-list li{counter-increment:s;position:relative;padding:4px 0 10px 46px}
+.steps-list li::before{content:counter(s);position:absolute;left:0;top:4px;width:32px;height:32px;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:700;font-size:16px}
+.btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:10px;padding:13px 22px;font:inherit;font-size:18px;font-weight:500;cursor:pointer;background:var(--brand);color:#fff;text-decoration:none}
+.btn:hover{background:#163e4c}
+.btn.secondary{background:#fff;color:var(--brand);border:1.5px solid var(--brand)}
+.btn.accent{background:var(--accent)} .btn.accent:hover{background:#9a5523}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px;align-items:center}
+.crumb{margin:22px 0 6px;font-size:15px}
+.crumb a{text-decoration:none}
+.progress{display:flex;gap:6px;margin:8px 0 20px}
+.progress span{flex:1;height:7px;border-radius:4px;background:#e3ded2}
+.progress span.on{background:var(--brand-2)}
+.stepmeta{color:var(--muted);font-size:15px}
+.field{margin:0 0 24px}
+.field > label, .field .lbl{display:block;font-weight:700;font-size:18px;margin-bottom:4px}
+.field .help{color:var(--muted);font-size:15px;margin:0 0 8px}
+input[type=text],input[type=date],textarea,select{width:100%;font:inherit;font-size:18px;padding:12px 14px;border:1.5px solid #c9c3b4;border-radius:10px;background:#fff;color:var(--ink)}
+input:focus,textarea:focus,select:focus{outline:3px solid rgba(47,122,114,.3);border-color:var(--brand-2)}
+textarea{min-height:110px;resize:vertical}
+.opt{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1.5px solid #ddd6c6;border-radius:10px;margin:0 0 8px;background:#fff;cursor:pointer}
+.opt:hover{border-color:var(--brand-2)}
+.field > label.opt{display:flex;font-weight:400;margin-bottom:8px}
+.opt input{width:22px;height:22px;margin-top:4px;flex:none;accent-color:var(--brand)}
+.opt.sel{border-color:var(--brand-2);background:var(--soft)}
+.addr-grid{display:grid;grid-template-columns:2fr 1.2fr .6fr .8fr;gap:10px}
+.addr-grid label,.tr-l{display:block;font-size:14px;font-weight:500;color:var(--muted);margin-bottom:2px}
+@media (max-width:700px){.addr-grid{grid-template-columns:1fr 1fr}.addr-grid .wide{grid-column:1/-1}}
+.tr-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:start}
+.tr-mid{padding-top:34px;text-align:center;max-width:170px}
+.tr-btn{font-size:16px;padding:10px 14px}
+.tr-status{font-size:14px;color:var(--muted);margin-top:6px;text-align:left}
+.tr-warn{margin-top:8px;color:var(--warn-ink)}
+@media (max-width:760px){.tr-grid{grid-template-columns:1fr}.tr-mid{padding-top:0;max-width:none;text-align:left}}
+.official{font-family:'Noto Serif',serif;font-size:14px;color:var(--brand-2);margin:-2px 0 4px;font-style:normal}
+.official-h{font-family:'Noto Serif',serif;font-style:normal;color:var(--brand-2);margin:-6px 0 6px;font-size:17px}
+.official-s{display:block;font-family:'Noto Serif',serif;font-style:normal;font-weight:400;font-size:15px;color:var(--brand-2);margin-top:2px}
+.saveall{border-top:1px solid var(--line);margin-top:6px;padding-top:12px}
+.infobox{background:var(--soft);border-radius:12px;padding:16px 20px;font-size:16.5px}
+.infobox p{margin:0 0 8px}.infobox ul{margin:0 0 8px;padding-left:22px}
+.mx-g{margin:18px 0 10px;padding:12px 16px;border-left:5px solid var(--brand);background:#f6f3ec;border-radius:0 10px 10px 0}
+.mx-gh{font-weight:700;font-size:19px;color:var(--brand)}
+.mx-gd{color:var(--muted);font-size:15px}
+.mx-gs{margin-top:8px;font-size:15px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.mx-q{background:#fff;border:1.5px solid var(--brand);color:var(--brand);border-radius:8px;padding:3px 12px;font:inherit;font-size:15px;cursor:pointer}
+.mx-q:hover{background:var(--soft)}
+.mx{border:1.5px solid #ddd6c6;border-radius:12px;padding:14px 16px;margin:0 0 10px;background:#fff}
+.mx.done{border-color:var(--brand-2)}
+.mx-h{font-weight:700}
+.mx-d{color:var(--muted);font-size:15px;margin:2px 0 10px}
+.mx-c{display:flex;flex-wrap:wrap;gap:8px}
+.mx-o{display:inline-flex;align-items:center;gap:6px;border:1.5px solid #c9c3b4;border-radius:999px;padding:6px 16px;cursor:pointer;font-size:16px;background:#fff}
+.mx-o input{position:absolute;opacity:0;width:0;height:0}
+.mx-o:focus-within{outline:3px solid rgba(47,122,114,.35)}
+.mx-o.sel.mx-no{background:#fdecea;border-color:#b42318;color:#8f1d14;font-weight:700}
+.mx-o.sel.mx-yes{background:#e6f4ef;border-color:#2f7a72;color:#1d4e5f;font-weight:700}
+.mx-o.sel.mx-trial{background:#fff4e5;border-color:#b5672d;color:#8a4b0f;font-weight:700}
+.rows .row{border:1px solid var(--line);border-radius:10px;padding:14px;margin:0 0 12px;background:#fdfcf9;position:relative}
+.rows .row .rowgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.rows .row label{font-size:14px;font-weight:500;color:var(--muted)}
+.rows .row input,.rows .row select{font-size:16px;padding:9px 10px}
+.rows .rm{position:absolute;top:8px;right:10px;background:none;border:0;color:#a33;cursor:pointer;font-size:14px}
+.err{color:#b42318;font-size:15px;margin-top:4px}
+.preview-wrap{background:#e9e5dc;border-radius:12px;padding:18px;overflow:auto;max-height:720px}
+.preview-wrap .page{transform-origin:top left}
+.pv-holder{margin:0 auto 14px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1f2a37;color:#fff;padding:12px 20px;border-radius:10px;font-size:16px;z-index:50;max-width:90vw}
+footer{color:var(--muted);font-size:14px;padding:30px 0 50px;border-top:1px solid var(--line);margin-top:30px}
+.check-grid label{display:flex;gap:10px;align-items:flex-start;margin:0 0 8px;cursor:pointer}
+.check-grid input{width:20px;height:20px;margin-top:5px;accent-color:var(--brand)}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 16px;font-size:16px}
+.kv b{color:var(--muted);font-weight:500}
+.hidden{display:none!important}
+.small{font-size:15px}
+@media (max-width:640px){h1{font-size:28px} body{font-size:17px} .kv{grid-template-columns:1fr}}
+
+/* ---------- Printable document pages (US Letter @96dpi) ---------- */
+.page{width:816px;height:1056px;background:#fff;color:#111;position:relative;box-shadow:0 2px 10px rgba(0,0,0,.15);font-family:"Noto Serif","Noto Serif SC","Songti SC",serif;font-size:13.3px;line-height:1.5}
+.page .inner{position:absolute;left:84px;right:84px;top:78px;bottom:96px;overflow:hidden}
+.page .pfoot{position:absolute;left:84px;right:84px;bottom:40px;font-size:10.5px;color:#555;display:flex;justify-content:space-between;border-top:1px solid #bbb;padding-top:6px;font-family:"Noto Sans SC",sans-serif}
+.page p{margin:0 0 9px;text-align:left}
+.page .ttl{text-align:center;font-weight:700;font-size:14.5px;line-height:1.45;margin:0 0 16px}
+.page h4{font-size:14px;margin:14px 0 6px;font-weight:700}
+.page h4.part{font-size:13.3px;letter-spacing:.3px;border-bottom:1.2px solid #222;padding-bottom:3px;margin:18px 0 8px}
+.page .fill{font-weight:700;text-decoration:underline;text-underline-offset:2px}
+.page .blank{display:inline-block;border-bottom:1px solid #222;min-width:120px;height:1em;vertical-align:baseline}
+.page .ck{display:inline-block;width:12px;height:12px;border:1.2px solid #222;margin-right:6px;vertical-align:-1px;text-align:center;font-size:11px;line-height:11px;font-family:Arial,sans-serif}
+.page table{width:100%;border-collapse:collapse;font-size:11.5px;margin:4px 0 10px}
+.page th,.page td{border:1px solid #888;padding:4px 6px;vertical-align:top;text-align:left}
+.page th{background:#f0eee8}
+.page .sig{display:grid;grid-template-columns:1fr 1fr;gap:18px 34px;margin:10px 0}
+.page .sigline{border-bottom:1px solid #222;height:30px}
+.page .siglbl{font-size:11px;color:#333}
+.page .indent{padding-left:22px}
+.page .note{font-size:11.5px;color:#333;font-style:normal}
+.page.tr-page .note{font-size:12px;color:#222}
+.page .boxed{border:1.2px solid #222;padding:10px 12px;margin:8px 0 12px}
+.page .flag{color:#9a3412;font-weight:700}
+.page ul{margin:0 0 9px;padding-left:20px}
+.page li{margin:0 0 3px}
+.page .instr{font-family:"Noto Sans SC",sans-serif;font-size:12.5px}
+.page .instr h4{font-size:15px}
+.page.tr-page .inner{top:96px}
+.page .pbanner{position:absolute;left:84px;right:84px;top:36px;border:1.5px solid #b42318;color:#b42318;font-family:'Noto Sans SC',sans-serif;font-size:11.5px;font-weight:700;text-align:center;padding:4px 6px;border-radius:4px;background:#fff7f6}
+.page .pbanner .pb-en{display:block;font-weight:400;font-size:9.5px}
+.page.tr-page{font-family:"Noto Serif SC","Songti SC","Noto Serif",serif;line-height:1.62}
+.pv-tabs{display:flex;gap:8px;margin:0 0 10px}
+.pv-tabs button{font:inherit;font-size:16px;padding:8px 16px;border-radius:999px;border:1.5px solid var(--brand);background:#fff;color:var(--brand);cursor:pointer}
+.pv-tabs button.on{background:var(--brand);color:#fff}
+#render-root{position:fixed;left:-20000px;top:0}
+.top nav{display:flex;align-items:center;gap:16px}
+.langbtn{background:#fff;color:var(--brand);border:0;border-radius:999px;padding:6px 16px;font:inherit;font-size:15px;font-weight:700;cursor:pointer;white-space:nowrap}
+.langbtn:hover{background:var(--soft)}
+.fsgrp{display:inline-flex;background:rgba(255,255,255,.15);border-radius:999px;padding:3px;gap:2px}
+.fsgrp button{background:none;border:0;color:#fff;font:inherit;font-weight:700;cursor:pointer;border-radius:999px;padding:2px 11px;line-height:1.6}
+.fsgrp button[aria-pressed=true]{background:#fff;color:var(--brand)}
+.fsgrp button:nth-child(1){font-size:14px}.fsgrp button:nth-child(2){font-size:17px}.fsgrp button:nth-child(3){font-size:20px}
+body.fs-1 #app, body.fs-1 #footwrap{zoom:1.15;max-width:835px}
+body.fs-2 #app, body.fs-2 #footwrap{zoom:1.32;max-width:727px}
+@media (max-width:640px){#navall{display:none} .logo small{display:none}}
+html[lang=en] h1, html[lang=en] h2, html[lang=en] h3, html[lang=en] .logo{font-family:"Noto Serif","Noto Serif SC",serif}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="logo" href="#home" id="logo"></a>
+  <nav><a href="#home" id="navall"></a><span class="fsgrp" id="fsgrp" role="group"><button type="button" data-fs="0">A</button><button type="button" data-fs="1">A</button><button type="button" data-fs="2">A</button></span><button class="langbtn" id="langbtn" type="button"></button></nav>
+</div></header>
+
+<main class="wrap" id="app"></main>
+
+<div class="wrap" id="footwrap"><footer id="foot"></footer></div>
+
+<div id="render-root"></div>
+
+<script>
+/* =========================================================
+   Language
+   ========================================================= */
+let LANG = null;
+try { LANG = localStorage.getItem('planahead-lang'); } catch(e){}
+if(LANG!=='zh' && LANG!=='en') LANG = (navigator.language||'').toLowerCase().startsWith('zh') ? 'zh' : 'en';
+const T = (zh, en) => LANG==='en' ? en : zh;
+const t = o => o==null ? '' : (typeof o==='string' ? o : (LANG==='en' ? (o.en ?? o.zh) : (o.zh ?? o.en)));
+/* bilingual label inside generated PDFs: English always, Chinese added in Chinese mode */
+const PB = (en, zh) => LANG==='en' ? en : `${en} ${zh}`;
+
+/* =========================================================
+   Helpers
+   ========================================================= */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const filled = v => v !== undefined && v !== null && String(v).trim() !== '';
+const F = (v, w=160) => filled(v) ? `<span class="fill">${esc(v)}</span>` : `<span class="blank" style="min-width:${w}px"></span>`;
+const paras = txt => String(txt||'').split(/\n+/).map(s=>s.trim()).filter(Boolean).map(s=>`<p>${esc(s)}</p>`);
+const strip = s => String(s).replace(/<[^>]+>/g,'');
+function toast(msg){ document.querySelectorAll('.toast').forEach(x=>x.remove()); const el=document.createElement('div'); el.className='toast'; el.textContent=msg; document.body.appendChild(el); setTimeout(()=>el.remove(), 3800); }
+
+const STORE_KEY = 'planahead-ct-v1';
+let ANSWERS = {};
+try { ANSWERS = JSON.parse(localStorage.getItem(STORE_KEY) || '{}') || {}; } catch(e) { ANSWERS = {}; }
+{ const ad = ANSWERS['advance-directive']; if(ad){ if(typeof ad.giftParts==='string'){ ad.giftOther = ad.giftParts; ad.giftParts = []; } if(typeof ad.giftLimited==='string'){ ad.giftLimited = []; } } }
+{ const h = ANSWERS['hipaa']; if(h && typeof h.srcList==='string' && !h.srcRows){ h.srcRows = h.srcList.split(/\n+/).map(x=>x.trim()).filter(Boolean).map(n=>({n})); } }
+const _poa = ANSWERS['power-of-attorney']; if(_poa && typeof _poa.special==='string' && !_poa.specialOpts){ /* keep old free text */ }
+if(ANSWERS['advance-directive'] && ANSWERS['advance-directive'].lw==='partial'){ ANSWERS['advance-directive'].lw='custom'; delete ANSWERS['advance-directive'].lwWant; }
+const PROFILE_FIELDS = [
+  {k:'name', t:'text', nm:true, label:{zh:'英文全名', en:'Full legal name'}},
+  {k:'addr', t:'address', label:{zh:'地址', en:'Address'}},
+  {k:'dob', t:'date', label:{zh:'出生日期', en:'Date of birth'}}
+];
+const hasVal = v => v && typeof v==='object' ? (filled(v.st)||filled(v.city)||filled(v.zip)) : filled(v);
+const profile = () => (ANSWERS._profile = ANSWERS._profile || {});
+/* Shared fields read from the profile; personal letters only prefill when empty */
+function syncShared(d){
+  const a = ANSWERS[d.id] = ANSWERS[d.id] || {}, P = profile();
+  d.steps.forEach(st=>st.fields.forEach(f=>{
+    if(f.shared){ if(hasVal(P[f.shared])) a[f.k] = P[f.shared]; else if(hasVal(a[f.k])) P[f.shared] = a[f.k]; }
+    else if(f.prefill && !filled(a[f.k]) && filled(P[f.prefill])) a[f.k] = P[f.prefill];
+  }));
+  if(d.id==='advance-directive'){ if(a.consSame==='same') a.consName = a.rep||''; if(a.consAltSame==='same') a.consAlt = a.alt||''; if(a.consAltSame==='none') a.consAlt = ''; }
+  if(d.id==='power-of-attorney'){ if(a.cons1Same==='same') a.cons1 = a.agent1||''; if(a.cons2Same==='same') a.cons2 = a.succ1||''; if(a.cons2Same==='none') a.cons2 = ''; }
+  return a;
+}
+function pushShared(d, k, v){
+  const f = d && d.steps.flatMap(st=>st.fields).find(x=>x.k===k && x.shared);
+  if(f){ profile()[f.shared] = v; }
+}
+function persist(){ try { localStorage.setItem(STORE_KEY, JSON.stringify(ANSWERS)); } catch(e){} }
+
+const sigCell = (label) => `<div><div class="sigline"></div><div class="siglbl">${label}</div></div>`;
+const witnessPair = (zh=false) => { const w = zh ? ['见证人签名','印刷体姓名','门牌号码和街道','城市、州和邮编'] : ['Witness signature','Printed name','Number and Street','City, State and Zip Code']; return `<div class="sig">${w.map(x=>sigCell(x)+sigCell(x)).join('')}</div>`; };
+
+/* Signing-instruction page: Chinese mode = Chinese + English; English mode = English only */
+function instructionBlocks(title, items){
+  const out = [`<div class="instr"><div class="ttl" style="font-family:'Noto Sans SC'">${PB('How to Sign and Make This Document Effective','· 签署与生效说明')}<br><span style="font-weight:400;font-size:12.5px">${esc(title)}</span></div></div>`];
+  items.forEach(([zh,en],i)=> out.push(LANG==='en'
+    ? `<div class="instr"><p><b>${i+1}.</b> ${en}</p></div>`
+    : `<div class="instr"><p><b>${i+1}. ${zh}</b><br><span style="color:#444">${en}</span></p></div>`));
+  out.push(`<div class="instr"><p class="note">${T('本页为说明页，签署前可移除，不属于文件正文。','')} This page is guidance only and is not part of the signed document. This document was prepared with a free self-help tool and is not legal advice.</p></div>`);
+  return out;
+}
+
+/* =========================================================
+   DOCUMENT DEFINITIONS
+   Each text item is {zh, en}.
+   ========================================================= */
+
+/* Life-sustaining treatments for the item-by-item choice in the Advance Directive */
+const LS_GROUPS = [
+  {v:'inv', zh:'有创或对身体负担大的治疗', en:'Invasive or physically burdensome treatments',
+   d:{zh:'会在身体上留下伤口、需要插管或手术，或者本身会带来明显的痛苦。', en:'These involve tubes, incisions or surgery, or cause significant pain or distress in themselves.'}},
+  {v:'non', zh:'无创或负担较轻的治疗', en:'Non-invasive or less burdensome treatments',
+   d:{zh:'不需要插管或手术，一般经面罩、口服或手臂上的点滴给予。负担较轻，但不代表完全没有不适。', en:'No breathing tube or surgery; usually given by mask, by mouth or through an IV in the arm. Less burdensome, though not always free of discomfort.'}}
+];
+const LS_ITEMS = [
+  {v:'vent', g:'inv', zh:'有创呼吸机（插管或气管切开）', en:'Breathing machine through a tube (intubation or tracheostomy)',
+   d:{zh:'从口或鼻插管到气管，或在颈部做气管切开，接呼吸机替您呼吸。通常需要镇静，插管期间不能说话、不能进食。', en:'A tube is placed through the mouth or nose into the windpipe, or through a tracheostomy in the neck, connected to a ventilator. Usually requires sedation; you cannot speak or eat while intubated.'},
+   pdf:'mechanical ventilation through a breathing tube (endotracheal intubation) or tracheostomy'},
+  {v:'cpr', g:'inv', zh:'心肺复苏（CPR）', en:'CPR (cardiopulmonary resuscitation)',
+   d:{zh:'心跳或呼吸停止时，进行用力的胸外按压、电击、注射急救药物，通常还会紧急插管。对末期或年老体弱的病人，成功率很低，常造成肋骨骨折。', en:'Forceful chest compressions, electric shocks and emergency drugs when the heart or breathing stops, usually with emergency intubation. For terminally ill or frail patients, success is rare and rib fractures are common.'},
+   pdf:'cardiopulmonary resuscitation (CPR)'},
+  {v:'ecmo', g:'inv', zh:'体外膜肺（ECMO）等心肺机器支持', en:'ECMO and other mechanical heart or lung support',
+   d:{zh:'在颈部或大腿的大血管插入粗管，把血液引出体外，用机器加氧后再送回体内，替代心肺功能。必须在加护病房深度镇静，可能出现大出血、中风、感染。', en:'Large tubes are placed in major blood vessels in the neck or groin; a machine oxygenates the blood outside the body and returns it, replacing heart and lung function. Requires deep sedation in intensive care; risks include major bleeding, stroke and infection.'},
+   pdf:'extracorporeal membrane oxygenation (ECMO) or other mechanical heart or lung support'},
+  {v:'tube', g:'inv', zh:'人工营养（插管喂食）', en:'Artificial nutrition (tube feeding)',
+   d:{zh:'经鼻胃管灌入营养液，或做小手术在腹部放置胃造口管（G-tube）。鼻胃管常令人不适，病人可能需要被约束以免拔管。', en:'Liquid nutrition through a tube in the nose, or a feeding tube placed in the abdomen by a minor procedure (G-tube). Nasal tubes are often uncomfortable, and patients may be restrained to keep them from pulling them out.'},
+   pdf:'artificial nutrition through a feeding tube'},
+  {v:'dialysis', g:'inv', zh:'洗肾（透析）', en:'Dialysis',
+   d:{zh:'肾衰竭时，用机器替代肾脏过滤血液。需要在大血管放置导管或做血管瘘管，通常每周数次，每次几小时。', en:'When the kidneys fail, a machine filters the blood. Requires a catheter in a large vein or a surgically created access, usually several times a week for a few hours each.'},
+   pdf:'dialysis'},
+  {v:'pressors', g:'inv', zh:'升压药', en:'Blood pressure medicines (vasopressors)',
+   d:{zh:'在加护病房经静脉给予强效药物，勉强维持血压。通常需要在颈部或胸部放置中心静脉导管。', en:'Powerful IV medicines, usually given in intensive care, to keep blood pressure up. Usually requires a central line in the neck or chest.'},
+   pdf:'medicines to maintain my blood pressure (vasopressors)'},
+  {v:'niv', g:'non', zh:'无创呼吸机（面罩，BiPAP / CPAP）', en:'Breathing support by mask (BiPAP / CPAP)',
+   d:{zh:'戴紧贴口鼻的面罩，由机器加压辅助呼吸，不插管，可以随时拿掉。面罩较紧，有些人会觉得不舒服或口干。', en:'A tight-fitting mask over the nose and mouth pushes air to help you breathe. No tube, and it can be removed at any time, though some people find the mask uncomfortable or drying.'},
+   pdf:'non-invasive ventilation by mask (such as BiPAP or CPAP)'},
+  {v:'iv', g:'non', zh:'人工水分（静脉输液）', en:'Artificial hydration (IV fluids)',
+   d:{zh:'经手臂静脉打点滴补充水分。', en:'Fluids given through an IV in the arm.'},
+   pdf:'artificial hydration through intravenous (IV) fluids'},
+  {v:'transfusion', g:'non', zh:'输血', en:'Blood transfusions',
+   d:{zh:'经静脉输入红血球、血小板或血浆等血液制品。', en:'Red blood cells, platelets or plasma given through a vein.'},
+   pdf:'blood transfusions'},
+  {v:'antibiotics', g:'non', zh:'用来延长生命的抗生素', en:'Antibiotics to prolong life',
+   d:{zh:'口服或静脉给予，治疗感染（例如肺炎）以延长生命。若只是为了减轻不适，不在此列。', en:'Given by mouth or IV to treat infections such as pneumonia in order to prolong life. Antibiotics given only for comfort are not included.'},
+   pdf:'antibiotics given to prolong my life (rather than solely for comfort)'}
+];
+
+
+/* Option lists that turn free text into standard English wording */
+const OTHER_REQ = [
+  {v:'home', zh:'如果可能，我希望在家中度过最后的日子', en:'If possible, I wish to spend my final days at home', pdf:'If possible, I wish to spend my final days at home.'},
+  {v:'hospice', zh:'适当的时候，我希望接受安宁疗护（hospice）', en:'When appropriate, I wish to receive hospice care', pdf:'When appropriate, I wish to receive hospice care.'},
+  {v:'pain', zh:'请充分控制我的疼痛和不适，即使所需药物可能缩短我的生命', en:'Fully treat my pain and discomfort, even if the medication needed may shorten my life', pdf:'I want my pain and discomfort fully treated, even if the medication needed to do so may shorten my life.'},
+  {v:'clergy', zh:'请联络我的宗教人员（牧师、神父、法师等）来陪伴我', en:'Contact a spiritual or religious leader of my faith to be with me', pdf:'I would like a spiritual or religious leader of my faith to be contacted and allowed to be with me.'},
+  {v:'family', zh:'请尽量让我的家人陪在我身边', en:'Allow my family to be with me as much as possible', pdf:'I would like my family to be allowed to be with me as much as possible.'}
+];
+const ORGANS = [
+  {v:'kidneys', zh:'肾脏', en:'Kidneys'},{v:'liver', zh:'肝脏', en:'Liver'},{v:'heart', zh:'心脏', en:'Heart'},{v:'lungs', zh:'肺', en:'Lungs'},
+  {v:'pancreas', zh:'胰脏', en:'Pancreas'},{v:'intestines', zh:'肠', en:'Intestines'},{v:'corneas', zh:'眼角膜', en:'Corneas'},
+  {v:'skin', zh:'皮肤', en:'Skin'},{v:'heart valves', zh:'心脏瓣膜', en:'Heart valves'},{v:'bone and connective tissue', zh:'骨骼及结缔组织', en:'Bone and connective tissue'}
+];
+const GIFT_PURPOSES = [
+  {v:'transplantation', zh:'器官移植', en:'Transplantation'},{v:'therapy', zh:'医疗治疗', en:'Therapy'},
+  {v:'research', zh:'医学研究', en:'Research'},{v:'education', zh:'医学教育', en:'Education'}
+];
+const POA_SPECIAL = [
+  {v:'gifts', zh:'允许代理人用我的财产赠与我的配偶、子女和孙辈，每人每年不超过联邦赠与税的年度免税额', en:'Allow my agent to make gifts to my spouse, children and grandchildren, up to the federal gift tax annual exclusion per person per year',
+   pdf:'My agent may make gifts of my property to my spouse, children and grandchildren, not exceeding, for each recipient in any calendar year, the federal gift tax annual exclusion amount.'},
+  {v:'springing', zh:'只有在两位医生书面证明我失去行为能力后才生效（不选的话，签署后立即生效）', en:'Effective only after two physicians certify in writing that I am incapacitated (otherwise it is effective once signed)',
+   pdf:'This power of attorney shall become effective only upon my incapacity, as determined in a written statement signed by two licensed physicians. Until that time, my agent shall have no authority to act on my behalf.'},
+  {v:'records', zh:'代理人必须保存所有收支记录，我的配偶或子女要求时须提供账目', en:'My agent must keep records of all transactions and give an accounting if my spouse or children ask',
+   pdf:'My agent shall keep records of all receipts, disbursements and transactions made on my behalf and shall provide an accounting upon the request of my spouse or any of my children.'},
+  {v:'nocomp', zh:'代理人不收报酬，但可以报销合理开支', en:'My agent serves without pay but may be reimbursed for reasonable expenses',
+   pdf:'My agent shall serve without compensation but shall be entitled to reimbursement of reasonable expenses incurred on my behalf.'},
+  {v:'comp', zh:'代理人可以收取合理报酬，并报销合理开支', en:'My agent may receive reasonable pay and be reimbursed for reasonable expenses',
+   pdf:'My agent shall be entitled to reasonable compensation and to reimbursement of reasonable expenses incurred on my behalf.'}
+];
+const PROVIDER_TYPES = [['Hospital','医院'],['Physician','医生'],['Clinic','诊所'],['Pharmacy','药房'],['Laboratory','化验室'],['Health plan / insurer','保险公司'],['Nursing or care facility','护理机构'],['Home health agency','居家护理机构'],['Other','其他']].map(([en,zh])=>({v:en,zh,en}));
+const usDate = v => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v||''); return m ? `${m[2]}/${m[3]}/${m[1]}` : (v||''); };
+const pickLabels = (list, vals, key='en') => list.filter(o=>(vals||[]).includes(o.v)).map(o=>o[key]);
+const A = v => !v ? '' : (typeof v==='string' ? v : [v.st, v.city, [v.state, v.zip].filter(filled).join(' ')].filter(filled).join(', '));
+
+const DOCS = [];
+
+/* ---------- 1. ADVANCE DIRECTIVE (CGS 19a-575a) ---------- */
+DOCS.push({
+  id:'advance-directive',
+  name:{zh:'医疗预嘱', en:'Advance Directive'},
+  official:'Health Care Instructions and Appointment of Health Care Representative',
+  tag:{zh:'生前预嘱 + 医疗委托 + 器官捐赠', en:'Living will + health care representative + organ donation'},
+  card:{zh:'一份文件包含：临终医疗意愿（生前预嘱）、指定医疗代表（医疗委托书）、预先指定监护人，以及器官捐赠意愿。',
+        en:'One document covering your end-of-life treatment wishes (living will), the person who makes medical decisions for you (health care representative), a future conservator, and organ donation.'},
+  statute:'Conn. Gen. Stat. § 19a-575a',
+  intro:{
+    purpose:{zh:'万一您因重病或意外<b>无法自己表达</b>医疗决定，这份文件告诉医生两件事：您对维生治疗（呼吸机、心肺复苏、插管喂食）的意愿，以及由<b>谁</b>代您做医疗决定。它还可以预先指定法院需要时的人身监护人（conservator of the person），并记录您的器官捐赠意愿。',
+             en:'If illness or injury ever leaves you <b>unable to speak for yourself</b>, this document tells your doctors two things: your wishes about life support (ventilators, CPR, tube feeding), and <b>who</b> makes health care decisions for you. It can also name the person you would want as conservator of the person if a court ever needs to appoint one, and record your wishes about organ donation.'},
+    who:{zh:'所有 18 岁以上的成年人。很多家庭直到急诊室里才发现，没人有权替病人做决定。',
+         en:'Every adult 18 or older. Many families only discover in the emergency room that nobody has the authority to decide for their loved one.'},
+    effective:[
+      {zh:'用英文打印出来（只填空，不改法定条文）。', en:'Print it in English. The statutory wording is not changed; only the blanks are filled in.'},
+      {zh:'在<b>两名成年见证人</b>面前签名并写上日期。见证人也签名并填写地址。', en:'Sign and date it in front of <b>two adult witnesses</b>, who then sign and add their addresses.'},
+      {zh:'<b>您指定的医疗代表不能当见证人。</b>', en:'<b>The person you appoint as health care representative may not be a witness.</b>'},
+      {zh:'公证不是必须的。如果想多一层保障，两位见证人可以在公证人面前签最后一页的"宣誓书"（Affidavit）。可以事后补签，但建议当天一起完成。', en:'Notarization is not required. For extra assurance, both witnesses may sign the optional affidavit on the last page before a notary. It can be done later, but doing it the same day is best.'},
+      {zh:'这份文件会<b>撤销您以前签过的医疗预嘱和医疗代表指定</b>。签好后，请收回或销毁旧文件的副本，并通知医生。', en:'This document <b>revokes any advance directive or health care representative appointment you signed before</b>. Collect or destroy copies of the old one and tell your doctors.'},
+      {zh:'把副本交给医疗代表、家庭医生和常去的医院，原件放在家人找得到的地方。', en:'Give copies to your representative, your doctor and your hospital, and keep the original where your family can find it.'}
+    ],
+    need:[{zh:'医疗代表和后备代表的英文全名', en:'Full legal names of your representative and an alternate'},{zh:'（可选）监护人人选', en:'(Optional) your choice of conservator'},{zh:'约 10 分钟', en:'About 10 minutes'}]
+  },
+  steps:[
+    {title:{zh:'关于您', en:'About you'}, fields:[
+      {k:'name', t:'text', nm:true, shared:'name', label:{zh:'您的英文全名', en:'Your full legal name'}, req:true},
+    ]},
+    {title:{zh:'维生治疗意愿', en:'Life support instructions'}, fields:[
+      {k:'lwInfo', t:'info', html:{
+        zh:`<p><b>什么是"维生治疗"？</b>康州法律（§19a-570）的定义是：<b>只能推迟死亡、或维持永久昏迷状态</b>的任何医疗程序或干预。同一种治疗，用在能康复的病人身上是"救命"，用在末期病人身上就是"维生"。</p>
+<p><b>这一部分什么时候才会用到？</b>只有在主治医生认定以下两种情况之一，而且您已经无法自己表达时：</p>
+<ul><li><b>末期</b>：无法治愈或不可逆转的疾病，如果不用维生治疗，会在较短时间内死亡；</li><li><b>永久失去意识</b>：永久昏迷或植物人状态，完全不能感知自己和外界，而且不可逆转。</li></ul>
+<p>平时生病、开刀、可以治好的急症，<b>都不受影响</b>，医生会照常全力治疗。</p>
+<p><b>不论您怎么选，依康州法律，舒适护理和止痛一定会提供</b>（§19a-573）。</p>`,
+        en:`<p><b>What is "life support"?</b> Connecticut law (§19a-570) defines a life support system as any medical procedure or intervention that would <b>serve only to postpone the moment of death or maintain a state of permanent unconsciousness</b>. The same treatment can save a patient who can recover, and only prolong dying for one who cannot.</p>
+<p><b>When does this section apply?</b> Only when your attending physician determines one of the following, and you can no longer speak for yourself:</p>
+<ul><li><b>Terminal condition</b>: an incurable or irreversible condition that, without life support, will cause death within a relatively short time;</li><li><b>Permanently unconscious</b>: a permanent coma or persistent vegetative state with no awareness of yourself or your surroundings, which is irreversible.</li></ul>
+<p>Ordinary illness, surgery, and treatable emergencies are <b>not affected</b>; doctors will treat you as usual.</p>
+<p><b>Whatever you choose, Connecticut law requires that comfort care and pain relief always be provided</b> (§19a-573).</p>`}},
+      {k:'lw', t:'radio', label:{zh:'在上述两种情况下，您希望：', en:'In either of those situations, I want:'}, req:true, opts:[
+        {v:'statutory', zh:'<b>不要维生治疗，只要舒适护理。</b>采用康州法定条文：不用人工呼吸、心肺复苏、人工营养与水分等维生系统，让我自然离世，但要给我足够的止痛药物。', en:'<b>No life support — comfort care only.</b> Uses the Connecticut statutory wording: no artificial respiration, CPR, artificial nutrition and hydration or other life support; allow a natural death, with enough pain medication to keep me comfortable.'},
+        {v:'custom', zh:'<b>我想逐项决定。</b>下一题会列出常见的维生治疗，每一项您都可以选"不要""要"或"可以短期试用"。', en:'<b>I want to decide treatment by treatment.</b> The next question lists common life-sustaining treatments; for each you can choose "No", "Yes" or "Time-limited trial".'},
+        {v:'full', zh:'<b>尽量延长生命。</b>只要医疗上合适，就使用所有维生治疗。', en:'<b>Prolong my life.</b> Use all life-sustaining treatment that is medically appropriate.'},
+        {v:'none', zh:'<b>不在这里写指示。</b>交由我的医疗代表按照他所知道的我的意愿决定。', en:'<b>No instructions here.</b> My health care representative decides based on what they know of my wishes.'}
+      ]},
+      {k:'lwItems', t:'matrix', label:{zh:'请逐项选择（末期或永久失去意识时）', en:'Choose for each treatment (if terminal or permanently unconscious)'}, show:a=>a.lw==='custom', req:true,
+        help:{zh:'"可以短期试用"指：先用一段时间（例如几天到两周），如果医生和您的医疗代表认为没有合理的康复希望，就停止。不确定的项目，建议和家庭医生讨论后再决定。', en:'"Time-limited trial" means: try it for a period (for example, a few days to two weeks), and stop if your doctor and representative find no reasonable hope of meaningful recovery. If unsure about any item, talk it over with your doctor.'},
+        choices:[{v:'no',zh:'不要',en:'No'},{v:'yes',zh:'要',en:'Yes'},{v:'trial',zh:'可以短期试用',en:'Time-limited trial'}],
+        items:LS_ITEMS, groups:LS_GROUPS},
+      {k:'lwPrinciple', t:'checks', label:{zh:'总原则（建议勾选）', en:'General principle (recommended)'}, show:a=>a.lw==='custom', help:{zh:'上面不可能列出所有治疗。写下一句总原则，遇到没列出的情况时，您的医疗代表和医生就有依据。', en:'No list can cover every treatment. A general principle guides your representative and doctors in situations not listed above.'}, opts:[
+        {v:'avoid', zh:'我希望避免会对身体造成额外创伤、或增加痛苦的有创治疗；请我的医疗代表在上面没列出的情况下，也按这个原则决定。', en:'I wish to avoid invasive treatments that would cause additional injury to my body or add to my suffering, and I ask my representative to apply this principle to anything not listed above.'}]}
+    ]},
+    {title:{zh:'其他医疗指示', en:'Other instructions'}, fields:[
+      {k:'preg', t:'radio', label:{zh:'如果您怀孕：', en:'If I am pregnant:'}, req:true, help:{zh:'如果您不可能怀孕，选第 2 项即可，对您没有影响。', en:'If pregnancy does not apply to you, choose option 2; it has no effect for you.'}, opts:[
+        {v:'1', zh:'(1) 如果医生认为维生治疗能让胎儿活着出生，我愿意接受维生治疗', en:'(1) I intend to accept life support systems if my doctor believes that doing so would allow my fetus to reach a live birth.'},
+        {v:'2', zh:'(2) 本文件照常适用，不做修改', en:'(2) I intend this document to apply without modifications.'},
+        {v:'3', zh:'(3) 另外说明', en:'(3) I intend this document to apply as follows:'}
+      ]},
+      {k:'pregText', t:'trtext', label:{zh:'请说明', en:'Please explain'}, show:a=>a.preg==='3', req:true},
+      {k:'otherReq', t:'checks', label:{zh:'其他心愿（可选，可多选）', en:'Other wishes (optional; choose any)'}, opts:OTHER_REQ},
+      {k:'other', t:'trtext', label:{zh:'还有其他具体要求吗？（可选）', en:'Any other specific requests? (optional)'}, help:{zh:'例如宗教上的特别要求。不需要可留空。', en:'For example, particular religious requirements. Leave blank if none.'}}
+    ]},
+    {title:{zh:'医疗代表', en:'Health care representative'}, fields:[
+      {k:'rep', t:'text', nm:true, label:{zh:'医疗代表的英文全名', en:'Health care representative – full name'}, req:true, help:{zh:'当医生判断您无法理解或表达医疗决定时，由此人代您做所有医疗决定。请选择您信任、了解您价值观、能在压力下做决定的人。', en:'This person makes all health care decisions for you if your doctor determines you cannot understand or communicate them. Choose someone you trust, who knows your values, and who can make hard decisions under pressure.'}},
+      {k:'alt', t:'text', nm:true, label:{zh:'后备医疗代表（建议填写）', en:'Alternative representative (recommended)'}, help:{zh:'第一人不愿意或无法担任时由此人接替。', en:'Steps in if your first choice is unwilling or unable to serve.'}}
+    ]},
+    {title:{zh:'监护人（可选）', en:'Conservator (optional)'}, fields:[
+      {k:'cons', t:'radio', label:{zh:'是否预先指定"人身监护人"？', en:'Designate a conservator of the person?'}, req:true, help:{zh:'<b>人身监护人</b>管的是您的生活和照顾（例如住在哪里、由谁照顾），由<b>法院</b>指定。<br>• 您签了医疗预嘱，通常就用不到监护人；只有在家人起争议、医疗代表无法担任或被告上法院时，法院才会介入。<br>• 法院原则上会指定您在这里提名的人，除非他不愿意、做不到，或被证明不适合（例如滥用权力）。<br>• 不提名的话，法院可能指定您不认识的人。<br>很多人会填写和医疗代表同一人。', en:'A <b>conservator of the person</b> oversees your care and living arrangements (where you live, who cares for you) and is appointed by a <b>court</b>.<br>• With an advance directive you usually never need one; a court steps in only if there is a family dispute, or your representative cannot serve or is taken to court.<br>• The court will appoint the person you name here unless they are unwilling, unable, or shown to be unfit (for example, for abusing their authority).<br>• If you name no one, the court may appoint someone you do not know.<br>Many people name the same person as their health care representative.'}, opts:[
+        {v:'yes', zh:'是', en:'Yes'},{v:'no', zh:'否，不包含这一部分', en:'No, leave this section out'}]},
+      {k:'consSame', t:'radio', label:{zh:'监护人是否就是您的医疗代表？', en:'Is the conservator the same person as your health care representative?'}, show:a=>a.cons==='yes', req:true, opts:[{v:'same', zh:'是，同一人（自动填入医疗代表的姓名）', en:'Yes, the same person (filled in automatically)'},{v:'other', zh:'否，另外指定一位', en:'No, someone else'}]},
+      {k:'consSameInfo', t:'info', show:a=>a.cons==='yes' && a.consSame==='same', html:a=>({zh:'监护人将填入：<b>'+(filled(a.rep)?esc(a.rep):'（请先在第 4 步填写医疗代表）')+'</b>', en:'Conservator will be: <b>'+(filled(a.rep)?esc(a.rep):'(enter your health care representative in step 4 first)')+'</b>'})},
+      {k:'consName', t:'text', nm:true, label:{zh:'监护人英文全名', en:'Conservator – full name'}, show:a=>a.cons==='yes' && a.consSame==='other', req:true},
+      {k:'consAltSame', t:'radio', label:{zh:'后备监护人', en:'Successor conservator'}, show:a=>a.cons==='yes', req:true, help:{zh:'建议填写<b>另一位</b>您信任的人。如果第一人无法担任或被法院认定不适合，法院会优先考虑这一位。', en:'We suggest a <b>different</b> person you trust. If your first choice cannot serve or is found unfit, the court will consider this person first.'}, opts:[{v:'same', zh:'与后备医疗代表同一人（自动填入）', en:'Same as my alternative health care representative (filled in automatically)'},{v:'other', zh:'另外指定一位', en:'Someone else'},{v:'none', zh:'不指定', en:'None'}]},
+      {k:'consAltInfo', t:'info', show:a=>a.cons==='yes' && a.consAltSame==='same', html:a=>({zh:'后备监护人将填入：<b>'+(filled(a.alt)?esc(a.alt):'（您还没有填写后备医疗代表，请回第 4 步填写）')+'</b>', en:'Successor conservator will be: <b>'+(filled(a.alt)?esc(a.alt):'(you have not entered an alternative representative — see step 4)')+'</b>'})},
+      {k:'consAlt', t:'text', nm:true, label:{zh:'后备监护人英文全名', en:'Successor conservator – full name'}, show:a=>a.cons==='yes' && a.consAltSame==='other'}
+    ]},
+    {title:{zh:'器官捐赠', en:'Anatomical gift'}, fields:[
+      {k:'gift', t:'radio', label:{zh:'您是否愿意在身故后捐赠器官或组织？', en:'Would you like to donate organs or tissue after death?'}, req:true, opts:[
+        {v:'any', zh:'愿意，捐赠任何需要的器官或组织', en:'Yes – any needed organs or parts'},
+        {v:'some', zh:'只捐赠特定器官或组织', en:'Only specific organs or parts'},
+        {v:'no', zh:'不在此文件中做器官捐赠（不包含这一部分）', en:'No – leave this section out'}]},
+      {k:'giftParts', t:'checks', label:{zh:'捐赠哪些器官或组织？（可多选）', en:'Which organs or parts? (choose any)'}, show:a=>a.gift==='some', req:true, opts:ORGANS},
+      {k:'giftOther', t:'trtext', label:{zh:'其他器官或组织（可选）', en:'Other organs or parts (optional)'}, show:a=>a.gift==='some'},
+      {k:'giftPurpose', t:'radio', label:{zh:'捐赠用途', en:'To be donated for'}, show:a=>a.gift && a.gift!=='no', req:true, opts:[
+        {v:'any', zh:'法律允许的任何用途（移植、治疗、研究、教学）', en:'Any purpose allowed by law (transplant, therapy, research, education)'},
+        {v:'limited', zh:'只限以下用途', en:'Only these limited purposes'}]},
+      {k:'giftLimited', t:'checks', label:{zh:'只限以下用途（可多选）', en:'Only for these purposes (choose any)'}, show:a=>a.gift && a.gift!=='no' && a.giftPurpose==='limited', req:true, opts:GIFT_PURPOSES}
+    ]}
+  ],
+  build(a, zh=false){
+    const X = (en, c) => zh ? c : en;
+    const hasCons = a.cons==='yes', hasGift = a.gift && a.gift!=='no';
+    let head = X(`THESE ARE MY HEALTH CARE INSTRUCTIONS.<br>MY APPOINTMENT OF A HEALTH CARE REPRESENTATIVE${(hasCons||hasGift)?',':''}`, `这是我的医疗指示。<br>我对医疗代表的指定${(hasCons||hasGift)?'，':''}`);
+    if(hasCons) head += X(`<br>THE DESIGNATION OF MY CONSERVATOR OF THE PERSON<br>FOR MY FUTURE INCAPACITY`, `<br>我对未来失能时<br>人身监护人的指定`);
+    if(hasGift) head += X(`<br>AND<br>MY DOCUMENT OF ANATOMICAL GIFT`, `<br>以及<br>我的器官捐赠文件`);
+    const together = [X('the appointment of my health care representative','我对医疗代表的指定')];
+    if(hasCons) together.push(X('the designation of my conservator of the person for future incapacity','我对未来失能时人身监护人的指定'));
+    if(hasGift) together.push(X('my document of anatomical gift','我的器官捐赠文件'));
+    const joinList = l => l.length===1? l[0] : zh ? l.slice(0,-1).join('、')+'以及'+l[l.length-1] : l.slice(0,-1).join(', ') + ' and ' + l[l.length-1];
+    const userText = k => zh && filled(a[k+'_zh']) ? a[k+'_zh'] : a[k];
+    const B = [];
+    B.push(`<div class="ttl">${head}</div>`);
+    B.push(X(`<p>To any physician or advanced practice registered nurse who is treating me: These are my health care instructions${a.lw!=='none'?' including those concerning the withholding or withdrawal of life support systems':''}, together with ${joinList(together)}. As my physician or advanced practice registered nurse, you may rely on these health care instructions and any decision made by my health care representative${hasCons?' or conservator of my person':''}, if I am incapacitated to the point when I can no longer actively take part in decisions for my own life, and am unable to direct my physician or advanced practice registered nurse as to my own medical care.</p>`,
+      `<p>致任何为我治疗的医生或高级执业注册护士：这是我的医疗指示${a.lw!=='none'?'（包括关于不予或撤除维生系统的指示）':''}，以及${joinList(together)}。如果我失能到无法再积极参与关于自己生命的决定，也无法就自己的医疗照护向医生或高级执业注册护士作出指示，作为我的医生或高级执业注册护士，您可以依赖这些医疗指示，以及我的医疗代表${hasCons?'或人身监护人':''}所作的任何决定。</p>`));
+    B.push(X(`<p>I revoke any prior health care instructions, living will, appointment of health care representative or health care agent, and designation of conservator of the person that I have made.</p>`,
+      `<p>我撤销我以前订立的任何医疗指示、生前预嘱、医疗代表或医疗代理人的指定，以及人身监护人的指定。</p>`));
+    let partNo = 0; const PART = (en, c) => { const n = ++partNo; return `<h4 class="part">${X(`PART ${n} – ${en}`, `第 ${n} 部分 – ${c}`)}</h4>`; };
+    B.push(PART('HEALTH CARE INSTRUCTIONS','医疗指示'));
+    const DEF = X(`By terminal condition, I mean that I have an incurable or irreversible medical condition which, without the administration of life support systems, will, in the opinion of my attending physician or advanced practice registered nurse, result in death within a relatively short time. By permanently unconscious I mean that I am in a permanent coma or persistent vegetative state which is an irreversible condition in which I am at no time aware of myself or the environment and show no behavioral response to the environment.`,
+      `所谓"末期状况"，是指我患有无法治愈或不可逆转的疾病，依我的主治医生或高级执业注册护士的意见，若不使用维生系统，将在相对短的时间内导致死亡。所谓"永久失去意识"，是指我处于永久昏迷或持续植物人状态，这是一种不可逆转的状况，我在任何时候都无法感知自己或周围环境，对环境也没有任何行为反应。`);
+    const COMFORT = X(`I do want sufficient pain medication to maintain my physical comfort. I do not intend any direct taking of my life, but only that my dying not be unreasonably prolonged.`,
+      `我确实希望获得足够的止痛药物，以维持身体上的舒适。我无意直接结束自己的生命，只是希望我的死亡过程不被不合理地延长。`);
+    const I_AM = X(`I, ${F(a.name,220)}, the author of this document,`, `本人 ${F(a.name,180)}，即本文件的订立人，`);
+    if(a.lw==='none'){
+      B.push(X(`<p>${I_AM} do not give specific instructions concerning life support systems in this document. My health care representative shall make such decisions in accordance with my wishes as otherwise known to my health care representative or, if my wishes are not known, in my best interests.</p>`,
+        `<p>${I_AM}不在本文件中就维生系统作出具体指示。我的医疗代表应依照其所知的我的意愿作出此类决定；如不知道我的意愿，则以我的最大利益为依归。</p>`));
+    } else if(a.lw==='full'){
+      B.push(X(`<p>${I_AM} request that, if my condition is deemed terminal or if I am determined to be permanently unconscious, all life support systems that are medically appropriate be provided to prolong my life, including, but not limited to, artificial respiration, cardiopulmonary resuscitation and artificial means of providing nutrition and hydration. ${DEF} I do want sufficient pain medication to maintain my physical comfort.</p>`,
+        `<p>${I_AM}要求：如果我的状况被认定为末期，或我被确定为永久失去意识，应提供一切医疗上适当的维生系统以延长我的生命，包括但不限于人工呼吸、心肺复苏以及人工提供营养和水分。${DEF}我确实希望获得足够的止痛药物，以维持身体上的舒适。</p>`));
+    } else if(a.lw==='custom'){
+      const m = a.lwItems||{};
+      const pick = c => LS_ITEMS.filter(it=>m[it.v]===c).map(it=> zh ? it.zh : it.pdf);
+      const fmt = l => zh ? l.join('；') : (l.length===1? l[0] : l.slice(0,-1).join('; ')+'; and '+l[l.length-1]);
+      const no = pick('no'), yes = pick('yes'), trial = pick('trial');
+      B.push(X(`<p>${I_AM} give the following instructions in the event my condition is deemed terminal or I am determined to be permanently unconscious. ${DEF}</p>`,
+        `<p>${I_AM}就我的状况被认定为末期、或我被确定为永久失去意识的情况，作出以下指示。${DEF}</p>`));
+      let li = 0; const L = () => String.fromCharCode(97 + li++);
+      if(no.length){ const l = L(); B.push(X(`<p class="indent">(${l}) I do not want the following life support systems, and I request that I be allowed to die and not be kept alive through them: ${fmt(no)}.</p>`,
+        `<p class="indent">(${l}) 我不要以下维生系统，并要求让我自然离世，不要通过这些系统维持生命：${fmt(no)}。</p>`)) };
+      if(yes.length){ const l = L(); B.push(X(`<p class="indent">(${l}) I do want the following to be provided: ${fmt(yes)}.</p>`,
+        `<p class="indent">(${l}) 我确实希望提供以下治疗：${fmt(yes)}。</p>`)) };
+      if(trial.length){ const l = L(); B.push(X(`<p class="indent">(${l}) I consent to a time-limited trial of the following, to be withdrawn if my attending physician or advanced practice registered nurse and my health care representative determine that there is no reasonable expectation of meaningful recovery: ${fmt(trial)}.</p>`,
+        `<p class="indent">(${l}) 我同意短期试用以下治疗；如果我的主治医生或高级执业注册护士与我的医疗代表认定没有合理的康复希望，应予以撤除：${fmt(trial)}。</p>`)) };
+      if((a.lwPrinciple||[]).includes('avoid')) B.push(X(`<p>As a general principle, I wish to avoid invasive treatments that would cause additional injury to my body or add to my suffering. I ask my health care representative and my physicians to apply this principle to any decision not specifically addressed above.</p>`,
+        `<p>作为总原则，我希望避免会对身体造成额外创伤或增加痛苦的有创治疗。对于上面没有具体提到的任何决定，我请我的医疗代表和医生按照这一原则处理。</p>`));
+      B.push(X(`<p>For any life support system not listed above, my health care representative shall decide in accordance with these instructions and my known wishes. ${COMFORT}</p>`,
+        `<p>对于上面没有列出的任何维生系统，我的医疗代表应依照这些指示及我已知的意愿作出决定。${COMFORT}</p>`));
+    } else {
+      B.push(X(`<p>${I_AM} request that, if my condition is deemed terminal or if I am determined to be permanently unconscious, I be allowed to die and not be kept alive through life support systems. ${DEF} The life support systems which I do not want include, but are not limited to: Artificial respiration, cardiopulmonary resuscitation and artificial means of providing nutrition and hydration. ${COMFORT}</p>`,
+        `<p>${I_AM}要求：如果我的状况被认定为末期，或我被确定为永久失去意识，让我自然离世，不要通过维生系统维持生命。${DEF}我不要的维生系统包括但不限于：人工呼吸、心肺复苏以及人工提供营养和水分。${COMFORT}</p>`));
+    }
+    const ck = v => `<span class="ck">${a.preg===v?'✓':''}</span>`;
+    B.push(X(`<p style="margin-bottom:4px"><b>If I am pregnant:</b></p>`, `<p style="margin-bottom:4px"><b>如果我怀孕：</b></p>`));
+    B.push(X(`<p class="indent" style="margin-bottom:4px">${ck('1')}(1) I intend to accept life support systems if my doctor believes that doing so would allow my fetus to reach a live birth.</p>`,
+      `<p class="indent" style="margin-bottom:4px">${ck('1')}(1) 如果我的医生认为接受维生系统可以让胎儿活着出生，我打算接受维生系统。</p>`));
+    B.push(X(`<p class="indent" style="margin-bottom:4px">${ck('2')}(2) I intend this document to apply without modifications.</p>`,
+      `<p class="indent" style="margin-bottom:4px">${ck('2')}(2) 我打算让本文件不作修改地适用。</p>`));
+    B.push(X(`<p class="indent">${ck('3')}(3) I intend this document to apply as follows: `, `<p class="indent">${ck('3')}(3) 我打算让本文件按以下方式适用：`) + `${a.preg==='3'?F(userText('pregText')):'<span class="blank" style="min-width:200px"></span>'}</p>`);
+    { const reqs = pickLabels(OTHER_REQ, a.otherReq, zh ? 'zh' : 'pdf').map(r => zh ? r+'。' : r);
+      if(reqs.length || filled(a.other)){ B.push(X(`<p><b>Other specific requests:</b></p>`, `<p><b>其他具体要求：</b></p>`)); reqs.forEach(r=>B.push(`<p class="indent">${esc(r)}</p>`)); paras(userText('other')).forEach(p=>B.push(p.replace('<p>','<p class="indent">'))); } }
+    B.push(PART('APPOINTMENT OF HEALTH CARE REPRESENTATIVE','指定医疗代表'));
+    B.push(X(`<p>I appoint ${F(a.rep,200)} to be my health care representative. If my attending physician or advanced practice registered nurse determines that I am unable to understand and appreciate the nature and consequences of health care decisions and unable to reach and communicate an informed decision regarding treatment, my health care representative is authorized to make any and all health care decisions for me, including (1) the decision to accept or refuse any treatment, service or procedure used to diagnose or treat my physical or mental condition, except as otherwise provided by law such as for psychosurgery or shock therapy, as defined in section 17a-540, and (2) the decision to provide, withhold or withdraw life support systems. I direct my health care representative to make decisions on my behalf in accordance with my wishes, as stated in this document or as otherwise known to my health care representative. In the event my wishes are not clear or a situation arises that I did not anticipate, my health care representative may make a decision in my best interests, based upon what is known of my wishes.</p>`,
+      `<p>我指定 ${F(a.rep,160)} 为我的医疗代表。如果我的主治医生或高级执业注册护士认定我无法理解和认识医疗决定的性质和后果，也无法就治疗作出并表达知情决定，我的医疗代表有权为我作出任何及所有医疗决定，包括：(1) 决定接受或拒绝用于诊断或治疗我身体或精神状况的任何治疗、服务或程序，但法律另有规定者除外，例如第 17a-540 条所定义的精神外科手术或电休克治疗；以及 (2) 决定提供、不予或撤除维生系统。我指示我的医疗代表依照本文件所述、或其所知的我的意愿，代我作出决定。如果我的意愿不明确，或出现我未曾预料的情况，我的医疗代表可以根据所知的我的意愿，以我的最大利益作出决定。</p>`));
+    B.push(X(`<p>If ${F(a.rep,180)} is unwilling or unable to serve as my health care representative, I appoint ${F(a.alt,180)} to be my alternative health care representative.</p>`,
+      `<p>如果 ${F(a.rep,160)} 不愿意或无法担任我的医疗代表，我指定 ${F(a.alt,160)} 为我的后备医疗代表。</p>`));
+    if(hasCons) B.push(PART('DESIGNATION OF CONSERVATOR OF THE PERSON','指定人身监护人'));
+    if(hasCons) B.push(X(`<p>If a conservator of my person should need to be appointed, I designate ${F(a.consName,180)} be appointed my conservator. If ${F(a.consName,160)} is unwilling or unable to serve as my conservator, I designate ${F(a.consAlt,180)} to be successor conservator. No bond shall be required of either of them in any jurisdiction.</p>`,
+      `<p>如果需要为我指定人身监护人，我指定由 ${F(a.consName,160)} 担任我的监护人。如果 ${F(a.consName,140)} 不愿意或无法担任我的监护人，我指定 ${F(a.consAlt,160)} 为继任监护人。在任何司法管辖区，均不要求他们中任何一人提供保证金。</p>`));
+    if(hasGift){
+      const g = v => `<span class="ck">${a.gift===v?'✓':''}</span>`, p = v => `<span class="ck">${a.giftPurpose===v?'✓':''}</span>`;
+      const parts = zh ? [...pickLabels(ORGANS,a.giftParts,'zh'), ...(filled(a.giftOther)?[userText('giftOther').trim()]:[])].join('、')
+                       : [...pickLabels(ORGANS,a.giftParts).map(x=>x.toLowerCase()), ...(filled(a.giftOther)?[a.giftOther.trim()]:[])].join(', ');
+      const purposes = zh ? pickLabels(GIFT_PURPOSES,a.giftLimited,'zh').join('、') : pickLabels(GIFT_PURPOSES,a.giftLimited).map(x=>x.toLowerCase()).join(', ');
+      B.push(PART('ANATOMICAL GIFT','器官捐赠') + X(
+        `<p style="margin-bottom:4px">I hereby make this anatomical gift, if medically acceptable, to take effect upon my death.</p><p style="margin-bottom:4px">I give: (check one)</p><p class="indent" style="margin-bottom:4px">${g('any')}(1) any needed organs or parts</p><p class="indent">${g('some')}(2) only the following organs or parts ${a.gift==='some'?F(parts):'<span class="blank"></span>'}</p><p style="margin-bottom:4px">to be donated for: (check one)</p><p class="indent" style="margin-bottom:4px">(1) ${p('any')}any of the purposes stated in subsection (a) of section 19a-289j</p><p class="indent">(2) ${p('limited')}these limited purposes ${a.giftPurpose==='limited'?F(purposes):'<span class="blank"></span>'}</p>`,
+        `<p style="margin-bottom:4px">如果医学上可以接受，我在此作出以下器官捐赠，于我死亡时生效。</p><p style="margin-bottom:4px">我捐赠：（勾选一项）</p><p class="indent" style="margin-bottom:4px">${g('any')}(1) 任何需要的器官或组织</p><p class="indent">${g('some')}(2) 只捐赠以下器官或组织 ${a.gift==='some'?F(parts):'<span class="blank"></span>'}</p><p style="margin-bottom:4px">捐赠用途：（勾选一项）</p><p class="indent" style="margin-bottom:4px">(1) ${p('any')}第 19a-289j 条 (a) 款所述的任何用途</p><p class="indent">(2) ${p('limited')}只限以下用途 ${a.giftPurpose==='limited'?F(purposes):'<span class="blank"></span>'}</p>`));
+    }
+    B.push(`<h4 class="part">${X('SIGNATURE','签名')}</h4>`);
+    B.push(X(`<p>These requests, appointments, and designations are made after careful reflection, while I am of sound mind. Any party receiving a duly executed copy or facsimile of this document may rely upon it unless such party has received actual notice of my revocation of it.</p>`,
+      `<p>以上要求、指定和指派，是我在神智清醒时经过慎重考虑后作出的。任何收到本文件经正式签署的副本或传真件的人，均可依赖本文件，除非其已实际收到我撤销本文件的通知。</p>`));
+    B.push(`<div class="sig">${sigCell(X('Date','日期'))}${sigCell(X('Signature of author (L.S.)','订立人签名（L.S. 盖印处）'))}<div></div><div class="siglbl">${X('Printed name','印刷体姓名')}: <b>${esc(a.name||'')}</b></div></div>`);
+    B.push(`<h4 class="part">${X('WITNESSES','见证人')}</h4>`);
+    B.push(X(`<p>This document was signed in our presence by ${F(a.name,200)} the author of this document, who appeared to be eighteen years of age or older, of sound mind and able to understand the nature and consequences of health care decisions at the time this document was signed. The author appeared to be under no improper influence. We have subscribed this document in the author's presence and at the author's request and in the presence of each other.</p>`,
+      `<p>本文件由订立人 ${F(a.name,160)} 在我们面前签署。签署时，订立人看起来年满十八岁、神智清醒，能够理解医疗决定的性质和后果，且看起来未受到任何不当影响。我们在订立人面前、应订立人的要求，并在彼此面前签署了本文件。</p>`));
+    B.push(witnessPair(zh));
+    B.push('__PAGEBREAK__');
+    B.push(`<h4 class="part">${X(`WITNESSES' AFFIDAVIT <span class="note">(optional)</span>`, `见证人宣誓书 <span class="note">（可选）</span>`)}</h4>` + X(`<p>STATE OF CONNECTICUT &nbsp;}&nbsp; ss. <span class="blank"></span> (Town)<br>COUNTY OF <span class="blank"></span></p>`, `<p>康涅狄格州 &nbsp;}&nbsp; ss. <span class="blank"></span>（镇）<br><span class="blank"></span> 县</p>`));
+    B.push(X(`<p>We, the subscribing witnesses, being duly sworn, say that we witnessed the execution of these health care instructions, the appointments of a health care representative${hasCons?', the designation of a conservator for future incapacity':''}${hasGift?' and a document of anatomical gift':''} by the author of this document; that the author subscribed, published and declared the same to be the author's instructions, appointments${hasCons?' and designation':''} in our presence; that we thereafter subscribed the document as witnesses in the author's presence, at the author's request, and in the presence of each other; that at the time of the execution of said document the author appeared to us to be eighteen years of age or older, of sound mind, able to understand the nature and consequences of said document, and under no improper influence, and we make this affidavit at the author's request this <span class="blank" style="min-width:40px"></span> day of <span class="blank" style="min-width:90px"></span> 20<span class="blank" style="min-width:24px"></span>.</p>`,
+      `<p>我们，即签名见证人，经正式宣誓后声明：我们见证了订立人签署这些医疗指示、医疗代表的指定${hasCons?'、未来失能时监护人的指定':''}${hasGift?'以及器官捐赠文件':''}；订立人在我们面前签署、公布并声明这是其指示${hasCons?'、指定和指派':'和指定'}；我们随后在订立人面前、应订立人的要求，并在彼此面前作为见证人签署了本文件；签署时，订立人在我们看来年满十八岁、神智清醒、能够理解该文件的性质和后果，且未受到任何不当影响。我们应订立人的要求，于 20<span class="blank" style="min-width:24px"></span> 年 <span class="blank" style="min-width:40px"></span> 月 <span class="blank" style="min-width:40px"></span> 日作出本宣誓书。</p>`));
+    B.push(`<div class="sig">${sigCell(X('Witness','见证人'))}${sigCell(X('Witness','见证人'))}</div>`);
+    B.push(X(`<p>Subscribed and sworn to before me this <span class="blank" style="min-width:40px"></span> day of <span class="blank" style="min-width:90px"></span> 20<span class="blank" style="min-width:24px"></span>.</p>`, `<p>于 20<span class="blank" style="min-width:24px"></span> 年 <span class="blank" style="min-width:40px"></span> 月 <span class="blank" style="min-width:40px"></span> 日在我面前签署并宣誓。</p>`) + `<div class="sig">${sigCell(X('Commissioner of the Superior Court / Notary Public','高等法院专员 / 公证人'))}${sigCell(X('My commission expires','执照到期日'))}</div><p class="note">${X('(Print or type name of all persons signing under all signatures)','（所有签名者请在签名下方以印刷体或打字写上姓名）')}</p>`);
+    if(zh) return {blocks:B};
+    const repZh = a.rep ? '（'+esc(a.rep)+'）' : '', repEn = a.rep ? ' ('+esc(a.rep)+')' : '';
+    const ins = instructionBlocks('Health Care Instructions / Appointment of Health Care Representative (Conn. Gen. Stat. § 19a-575a)', [
+      ['找两位年满 18 岁的成年人当见证人。<b>您指定的医疗代表'+repZh+'不能当见证人。</b>','Two adult witnesses are required. Your health care representative'+repEn+' may not serve as a witness.'],
+      ['三人在场：您先在 "Signature of author" 处签名并写日期，两位见证人随后在见证栏签名，并填写印刷体姓名和<b>他们自己的住址</b>（不是签名的地点），方便以后需要时找到他们。','With all three present, sign and date at "Signature of author"; then both witnesses sign, print their names, and write <b>their own home addresses</b> (not where the signing takes place) so they can be located later if needed.'],
+      ['（可选）最后一页是 "Witnesses\' Affidavit"（见证人宣誓书）。两位见证人一起在公证人面前签名，公证人盖章。以后如果有人质疑这份文件，就不必再找见证人出面作证。<b>可以事后补签，但建议当天一起完成</b>：带两位见证人去银行或 UPS 店，按"您签名 → 见证人签名 → 见证人签宣誓书 → 公证人盖章"的顺序一次办好。宣誓书上公证人执照的到期日，不会让文件失效。','Optional: the last page is the Witnesses\' Affidavit. Both witnesses sign it together before a notary public or Commissioner of the Superior Court, so they will not need to testify later if the document is questioned. It can be signed later, but doing everything the same day is best (for example at a bank): you sign, the witnesses sign, the witnesses sign the affidavit, and the notary completes it. The notary\'s commission expiration date does not affect the validity of your document.'],
+      ['把副本交给医疗代表、后备代表、家庭医生和常去的医院，原件放在家人知道的地方，不要锁在保险箱里。','Give copies to your representative(s), physician and hospital. Keep the original somewhere accessible, not in a safe-deposit box.'],
+      ['这份文件会撤销您以前签过的医疗预嘱和医疗代表指定。请收回或销毁旧文件的所有副本，并把新文件交给医生和医院。医生在不知道已撤销的情况下照旧文件执行，是不用负责的，所以一定要通知到位。','This document revokes your earlier advance directives and appointments. Collect or destroy all copies of old documents and give the new one to your doctors and hospital — providers who do not know of a revocation may still follow the old document.'],
+      ['日后想撤销或更换医疗代表，必须书面撤销，由您本人和两位见证人签名；最简单的做法就是重新签一份新的。生前预嘱（维生治疗意愿）则可以随时以任何方式撤销。离婚或法定分居时，对配偶的指定会自动撤销。','To revoke or replace your representative later, do so in writing signed by you and two witnesses — signing a new document is the simplest way. Your living will can be revoked at any time in any manner. Appointment of a spouse is revoked by divorce or legal separation.']
+    ]);
+    return {blocks:B, instructions:ins, file:'Advance-Directive-CT'};
+  }
+});
+
+/* ---------- 2. POWER OF ATTORNEY (CGS 1-352 Short Form) ---------- */
+const POWERS = [['A','Real property','房地产'],['B','Tangible personal property','有形个人财产（车、首饰、家具等）'],['C','Stocks and bonds','股票与债券'],['D','Commodities and options','期货与期权'],['E','Banks and other financial institutions','银行及其他金融机构'],['F','Operation of entity or business','经营公司或生意'],['G','Insurance and annuities','保险与年金'],['H','Estates, trusts and other beneficial interests','遗产、信托及其他受益权益'],['I','Claims and litigation','索赔与诉讼'],['J','Personal and family maintenance','个人与家庭生活开支'],['K','Benefits from governmental programs or civil or military service','政府福利、公职或军人福利'],['L','Retirement plans','退休计划'],['M','Taxes','税务'],['N','All other matters','所有其他事项']];
+DOCS.push({
+  id:'power-of-attorney',
+  name:{zh:'财务授权书', en:'Durable Power of Attorney'},
+  official:'Durable Statutory Power of Attorney – Short Form',
+  tag:{zh:'代理人 · 法定短版', en:'Financial agent · statutory short form'},
+  card:{zh:'指定一位您信任的人（代理人）代您处理银行、房产、保险、税务等财务事务；您失去行为能力后依然有效。',
+        en:'Name someone you trust (your agent) to handle banking, real estate, insurance, taxes and other financial matters for you — even if you become incapacitated.'},
+  statute:'Conn. Gen. Stat. § 1-352 (Short Form)',
+  intro:{
+    purpose:{zh:'如果您因中风、失智或意外<b>无法自己处理财务</b>，没有授权书的话，家人往往要去遗嘱认证法院申请监护（conservatorship），费时又费钱。授权书让您事先指定代理人（agent）代您付账单、管理银行账户、处理房产、保险和税务。本文件采用康州法定的"持久授权书短版"，失去行为能力后依然有效，并且<b>签署后立即生效</b>（除非您在特别说明里另有约定）。',
+             en:'If a stroke, dementia or an accident leaves you <b>unable to manage your finances</b>, and you have no power of attorney, your family usually has to ask the Probate Court for a conservatorship — slow and expensive. A power of attorney lets you name an agent in advance to pay bills, manage accounts, and handle real estate, insurance and taxes. This uses Connecticut\'s statutory "durable" short form: it stays effective if you become incapacitated and is <b>effective as soon as it is signed</b> unless your special instructions say otherwise.'},
+    who:{zh:'所有成年人，尤其是有房产、退休账户、生意，或者年事渐高的人。<b>注意：这份文件不包括医疗决定</b>，医疗决定请用"医疗预嘱"。',
+         en:'Every adult — especially homeowners, people with retirement accounts or a business, and older adults. <b>Note: this document does not cover medical decisions</b>; use the Advance Directive for those.'},
+    effective:[
+      {zh:'用英文打印。', en:'Print it in English.'},
+      {zh:'签名前，亲手划掉您<b>不想授权</b>的项目，并在旁边的框里写上您姓名的首字母缩写。', en:'Before signing, draw a line through any power you do <b>not</b> want to grant and write your initials in the box beside it.'},
+      {zh:'在<b>两名见证人</b>和<b>一位公证人</b>面前签名。康州法律两者都要求（公证人可以兼任其中一名见证人）。', en:'Sign in front of <b>two witnesses</b> and <b>a notary public</b>. Connecticut requires both (the notary may also serve as one witness).'},
+      {zh:'代理人不应当见证人。', en:'Your agent should not be a witness.'},
+      {zh:'把原件交给代理人或妥善保存；银行可能要求看原件，或要求代理人签一份"代理人证明书"。', en:'Keep the original safe or give it to your agent. Banks may ask to see the original or ask your agent to sign a certification.'}
+    ],
+    need:[{zh:'代理人和后备代理人的英文全名与地址', en:'Full names and addresses of your agent and successor agent'},{zh:'您想排除哪些授权项目（如有）', en:'Which powers, if any, you want to exclude'},{zh:'需要找公证人（银行通常免费为客户公证）', en:'Access to a notary (many banks notarize free for customers)'},{zh:'约 10 分钟', en:'About 10 minutes'}]
+  },
+  steps:[
+    {title:{zh:'关于您', en:'About you'}, fields:[
+      {k:'name', t:'text', nm:true, shared:'name', label:{zh:'您的英文全名', en:'Your full legal name'}, req:true},
+      {k:'addr', t:'address', shared:'addr', label:{zh:'您的地址', en:'Your address'}, req:true},
+      {k:'revoke', t:'radio', label:{zh:'您以前签过财务授权书吗？', en:'Have you signed a financial power of attorney before?'}, req:true, help:{zh:'依康州法律，签新的授权书<b>不会自动撤销</b>旧的，除非新文件里写明。', en:'Under Connecticut law, a new power of attorney does <b>not</b> automatically revoke an earlier one unless it says so.'}, opts:[
+        {v:'none', zh:'没有签过', en:'No, never'},
+        {v:'all', zh:'签过，这份新的要取代以前所有的财务授权书', en:'Yes — this new one should replace all earlier ones'},
+        {v:'keep', zh:'签过，但以前的继续有效（例如专门给某家银行的授权书）', en:'Yes — but the earlier ones should stay in effect (e.g., one made for a specific bank)'}]}
+    ]},
+    {title:{zh:'代理人', en:'Agent(s)'}, fields:[
+      {k:'agent1', t:'text', nm:true, label:{zh:'代理人英文全名', en:'Agent – full name'}, req:true},
+      {k:'agent1addr', t:'address', label:{zh:'代理人地址', en:'Agent – address'}, req:true},
+      {k:'two', t:'radio', label:{zh:'是否同时指定第二位代理人？', en:'Name a second (co-)agent?'}, req:true, opts:[{v:'no',zh:'否，只要一位',en:'No, just one agent'},{v:'yes',zh:'是，两位共同代理',en:'Yes, two agents'}], help:{zh:'大多数人只指定一位代理人，另设后备代理人。两位共同代理时，需要决定他们是一起签还是各自都能签。', en:'Most people name one agent plus a successor. With two agents, you must decide whether they act together or each may act alone.'}},
+      {k:'agent2', t:'text', nm:true, label:{zh:'第二位代理人英文全名', en:'Second agent – full name'}, show:a=>a.two==='yes', req:true},
+      {k:'agent2addr', t:'address', label:{zh:'第二位代理人地址', en:'Second agent – address'}, show:a=>a.two==='yes', req:true},
+      {k:'how', t:'radio', label:{zh:'两位代理人如何行使权力？', en:'How should the two agents act?'}, show:a=>a.two==='yes', req:true, opts:[
+        {v:'severally', zh:'各自单独即可（severally）：任何一位都能单独签字办事，比较方便', en:'Severally – either one may act alone (more convenient)'},
+        {v:'jointly', zh:'必须共同（jointly）：两位都要同意并签字，比较保险但不方便', en:'Jointly – both must agree and sign (more cautious, less convenient)'}]}
+    ]},
+    {title:{zh:'授权范围', en:'Powers granted'}, fields:[
+      {k:'strike', t:'checks', label:{zh:'有没有您<b>不想</b>授权的项目？（不勾选 = 全部授权）', en:'Are there powers you do <b>not</b> want to grant? (Check none = grant all)'}, help:{zh:'这些项目不会从文件中删除。签名前需要您亲手划掉并写缩写，系统会在说明页提醒您。只要排除 (A)–(M) 中任何一项，(N)"所有其他事项"也会自动被排除。', en:'These items stay in the document; you strike them by hand and initial before signing, and the instruction page will remind you. Excluding any of (A)–(M) also automatically excludes (N) "All other matters".'}, opts: POWERS.slice(0,13).map(p=>({v:p[0], zh:`(${p[0]}) ${p[2]}`, en:`(${p[0]}) ${p[1]}`}))},
+      {k:'specialOpts', t:'checks', label:{zh:'常见的特别说明（可选，可多选）', en:'Common special instructions (optional; choose any)'}, help:{zh:'注意：默认情况下，代理人<b>不能</b>用您的财产让自己或其家属受益，除非您在这里明确授权。不确定的话可以都不选。', en:'By default your agent may <b>not</b> use your property to benefit the agent or the agent\'s dependents unless you authorize it here. If unsure, leave these unchecked.'}, opts:POA_SPECIAL},
+      {k:'special', t:'trtext', label:{zh:'其他特别说明或限制（可选）', en:'Other special instructions or limitations (optional)'}, help:{zh:'不需要可留空。', en:'Leave blank if none.'}}
+    ]},
+    {title:{zh:'后备代理人', en:'Successor agents'}, fields:[
+      {k:'succ1', t:'text', nm:true, label:{zh:'后备代理人（建议填写）', en:'Successor agent (recommended)'}},
+      {k:'succ1addr', t:'address', label:{zh:'后备代理人地址', en:'Successor agent – address'}, show:a=>filled(a.succ1)},
+      {k:'succ2', t:'text', nm:true, label:{zh:'第二后备代理人（可选）', en:'Second successor agent (optional)'}, show:a=>filled(a.succ1)},
+      {k:'succ2addr', t:'address', label:{zh:'第二后备代理人地址', en:'Second successor agent – address'}, show:a=>filled(a.succ2)}
+    ]},
+    {title:{zh:'财产监护人（可选）', en:'Conservator of estate (optional)'}, fields:[
+      {k:'cons', t:'radio', label:{zh:'如果将来法院需要为您指定"财产监护人"，是否预先提名？', en:'If a court ever needs to appoint a conservator of your estate, do you want to name one now?'}, req:true, help:{zh:'<b>财产监护人</b>管的是您的钱和财产，由<b>法院</b>指定。<br>• 您签了财务授权书，通常就用不到监护人；只有在家人起争议、代理人无法担任或被告上法院时，法院才会介入。<br>• 法院原则上会指定您在这里提名的人，除非他不愿意、做不到，或被证明不适合（例如滥用权力）。<br>• 不提名的话，法院可能指定您不认识的人。<br>很多人会填写和代理人同一人。', en:'A <b>conservator of the estate</b> manages your money and property and is appointed by a <b>court</b>.<br>• With a power of attorney you usually never need one; a court steps in only if there is a family dispute, or your agent cannot serve or is taken to court.<br>• The court will appoint the person you name here unless they are unwilling, unable, or shown to be unfit (for example, for abusing their authority).<br>• If you name no one, the court may appoint someone you do not know.<br>Many people name the same person as their agent.'}, opts:[{v:'yes',zh:'是',en:'Yes'},{v:'no',zh:'否，留空',en:'No, leave blank'}]},
+      {k:'cons1Same', t:'radio', label:{zh:'财产监护人是否就是您的代理人？', en:'Is the conservator the same person as your agent?'}, show:a=>a.cons==='yes', req:true, opts:[{v:'same', zh:'是，同一人（自动填入代理人的姓名）', en:'Yes, the same person (filled in automatically)'},{v:'other', zh:'否，另外指定一位', en:'No, someone else'}]},
+      {k:'cons1Info', t:'info', show:a=>a.cons==='yes' && a.cons1Same==='same', html:a=>({zh:'财产监护人将填入：<b>'+(filled(a.agent1)?esc(a.agent1):'（请先在第 2 步填写代理人）')+'</b>', en:'Conservator will be: <b>'+(filled(a.agent1)?esc(a.agent1):'(enter your agent in step 2 first)')+'</b>'})},
+      {k:'cons1', t:'text', nm:true, label:{zh:'财产监护人英文全名', en:'Conservator of estate – full name'}, show:a=>a.cons==='yes' && a.cons1Same==='other', req:true},
+      {k:'cons2Same', t:'radio', label:{zh:'后备财产监护人', en:'Alternate conservator'}, show:a=>a.cons==='yes', req:true, help:{zh:'建议填写<b>另一位</b>您信任的人。如果第一人无法担任或被法院认定不适合，法院会优先考虑这一位。', en:'We suggest a <b>different</b> person you trust. If your first choice cannot serve or is found unfit, the court will consider this person first.'}, opts:[{v:'same', zh:'与后备代理人同一人（自动填入）', en:'Same as my successor agent (filled in automatically)'},{v:'other', zh:'另外指定一位', en:'Someone else'},{v:'none', zh:'不指定', en:'None'}]},
+      {k:'cons2Info', t:'info', show:a=>a.cons==='yes' && a.cons2Same==='same', html:a=>({zh:'后备财产监护人将填入：<b>'+(filled(a.succ1)?esc(a.succ1):'（您还没有填写后备代理人，请回第 4 步填写）')+'</b>', en:'Alternate conservator will be: <b>'+(filled(a.succ1)?esc(a.succ1):'(you have not entered a successor agent — see step 4)')+'</b>'})},
+      {k:'cons2', t:'text', nm:true, label:{zh:'后备财产监护人英文全名', en:'Alternate conservator – full name'}, show:a=>a.cons==='yes' && a.cons2Same==='other'},
+      {k:'bond', t:'radio', label:{zh:'是否要求监护人提供保证金（bond）？', en:'Should the conservator be required to post a bond?'}, show:a=>a.cons==='yes', req:true, opts:[{v:'not',zh:'不要求（常见选择，可省费用）',en:'Not required (common; saves cost)'},{v:'be',zh:'要求',en:'Required'}]}
+    ]}
+  ],
+  build(a, zh=false){
+    const X = (en, c) => zh ? c : en;
+    const userText = k => zh && filled(a[k+'_zh']) ? a[k+'_zh'] : a[k];
+    const agents = a.two==='yes' ? `${esc(a.agent1||'')}, ${esc(A(a.agent1addr))}; ${X('and','以及')} ${esc(a.agent2||'')}, ${esc(A(a.agent2addr))}` : `${esc(a.agent1||'')}, ${esc(A(a.agent1addr))}`;
+    const howZh = {severally:'各自单独（severally）', jointly:'共同（jointly）'};
+    const B = [];
+    B.push(`<div class="ttl">${X('DURABLE STATUTORY POWER OF ATTORNEY - SHORT FORM','持久法定授权书 – 短版')}</div>`);
+    B.push(X(`<div class="boxed"><p style="margin:0"><b>Notice:</b> The powers granted by this document are broad and sweeping. They are defined in the Connecticut Uniform Power of Attorney Act, which expressly permits the use of any other or different form of power of attorney desired by the parties concerned. The grantor of any power of attorney or the agent may make application to a Probate Court for an accounting as provided in subsection (d) of section 45a-175 of the general statutes. This power of attorney does not authorize the agent to make health care decisions for you.</p></div>`,
+      `<div class="boxed"><p style="margin:0"><b>注意：</b>本文件授予的权力范围广泛而全面。这些权力由《康涅狄格州统一授权书法》定义，该法明确允许当事人使用其希望的任何其他或不同格式的授权书。任何授权书的授予人或代理人，均可依照康州法规第 45a-175 条 (d) 款，向遗嘱认证法院申请查账。本授权书并不授权代理人为您作出医疗决定。</p></div>`));
+    B.push(X(`<p>Know All Persons by These Presents, which are intended to constitute a GENERAL POWER OF ATTORNEY pursuant to the Connecticut Uniform Power of Attorney Act:</p>`,
+      `<p>兹告知所有人，本文件拟依照《康涅狄格州统一授权书法》构成一份<b>一般授权书</b>：</p>`));
+    const how = a.two==='yes' ? F(zh ? (howZh[a.how]||'') : a.how, 80) : '<span class="blank" style="min-width:80px"></span>';
+    B.push(X(`<p>That I <span class="fill">${esc(a.name||'')}, ${esc(A(a.addr))}</span> do hereby appoint <span class="fill">${agents}</span> my agent(s) TO ACT ${how}.</p>`,
+      `<p>本人 <span class="fill">${esc(a.name||'')}，${esc(A(a.addr))}</span>，特此指定 <span class="fill">${agents}</span> 为我的代理人，${how} 行事。</p>`));
+    B.push(X(`<p class="note">If more than one agent is designated and the principal wishes each agent alone to be able to exercise the power conferred, insert in this blank the word 'severally'. Failure to make any insertion or the insertion of the word 'jointly' shall require the agents to act jointly.</p>`,
+      `<p class="note">如果指定了一位以上的代理人，且授权人希望每位代理人都能单独行使所授予的权力，请在空白处填入 'severally'（各自单独）。如果不填写，或填入 'jointly'（共同），代理人必须共同行事。</p>`));
+    B.push(X(`<p>First: In my name, place and stead in any way which I myself could do, if I were personally present, with respect to the following matters as each of them is defined in the Connecticut Uniform Power of Attorney Act to the extent that I am permitted by law to act through an agent:</p>`,
+      `<p>第一：以我的名义、代表我，就以下各项事项（每一项均按《康涅狄格州统一授权书法》的定义），在法律允许我通过代理人行事的范围内，以我本人亲自在场时可以采取的任何方式行事：</p>`));
+    B.push(X(`<p class="note">(Strike out and initial in the opposite box any one or more of the subparagraphs as to which the principal does NOT desire to give the agent authority. Such elimination of any one or more of subparagraphs (A) to (M), inclusive, shall automatically constitute an elimination also of subparagraph (N).)<br>To strike out any subparagraph the principal must draw a line through the text of that subparagraph AND write his initials in the box opposite.</p>`,
+      `<p class="note">（对于授权人<b>不</b>希望授予代理人权力的任何一项或多项分项，请划掉，并在对面的方框内写上姓名缩写。删除 (A) 至 (M) 中的任何一项或多项，将自动同时删除 (N) 项。）<br>要划掉任何分项，授权人必须在该分项的文字上划一条线，<b>并</b>在对面的方框内写上姓名缩写。</p>`));
+    B.push(`<table style="font-size:12.5px;width:78%;margin-left:6%">${POWERS.map(p=>`<tr><td style="width:40px;border:0">(${p[0]})</td><td style="border:0">${zh ? p[2] : p[1]+';'}</td><td style="width:58px;border:0;text-align:right">(&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)</td></tr>`).join('')}</table>`);
+    const spList = [
+      ...(a.revoke==='all' ? [X('<p>I revoke all powers of attorney previously executed by me, other than any document appointing a health care representative or concerning health care decisions.</p>', '<p>我撤销我以前签署的所有授权书，但任何指定医疗代表或涉及医疗决定的文件除外。</p>')] : []),
+      ...pickLabels(POA_SPECIAL, a.specialOpts, zh ? 'zh' : 'pdf').map(x=>`<p>${esc(zh ? x+'。' : x)}</p>`),
+      ...paras(userText('special'))];
+    const sp = spList.length ? spList.join('') : '<div class="sigline"></div><div class="sigline"></div><div class="sigline"></div>';
+    B.push(`<p style="margin-bottom:2px"><b>${X('Special instructions:','特别说明：')}</b></p><div class="indent">${sp}</div>`);
+    B.push(X(`<p class="note">(Special provisions and limitations may be included in the statutory form power of attorney only if they conform to the requirements of the Connecticut Uniform Power of Attorney Act.)</p>`,
+      `<p class="note">（只有在符合《康涅狄格州统一授权书法》要求的情况下，才可以在法定格式授权书中加入特别条款和限制。）</p>`));
+    B.push(X(`<p>Second: LIMITATION ON AGENT'S AUTHORITY</p><p>An agent MAY NOT use my property to benefit the agent or a dependent of the agent unless I have included that authority in any special instructions below.</p>`,
+      `<p>第二：代理人权力的限制</p><p>代理人<b>不得</b>使用我的财产让代理人本人或其受扶养人受益，除非我在下方的任何特别说明中授予了该项权力。</p>`));
+    B.push(X(`<p>Third: Hereby ratifying and confirming all that said agent(s) or substitute(s) do or cause to be done.</p>`,
+      `<p>第三：特此追认并确认上述代理人或其替代人所做或促使完成的一切事项。</p>`));
+    B.push(X(`<p>Fourth: With full and unqualified authority to exercise or delegate any or all of the foregoing powers granted under this power of attorney to any person or persons whom my agent(s) shall select.</p>`,
+      `<p>第四：代理人具有完全且无条件的权力，可以行使本授权书所授予的上述任何或全部权力，或将其转授给代理人所选定的任何人。</p>`));
+    B.push(X(`<p>Fifth: DESIGNATION OF SUCCESSOR AGENT(S) (OPTIONAL)</p><p>If my agent is unable or unwilling to act for me, I name as my successor agent:<br>Name of Successor Agent: ${F(a.succ1,220)}<br>Successor Agent's Address: ${F(A(a.succ1addr),260)}</p><p>If my successor agent is unable or unwilling to act for me, I name as my second successor agent:<br>Name of Second Successor Agent: ${F(a.succ2,220)}<br>Second Successor Agent's Address: ${F(A(a.succ2addr),260)}</p>`,
+      `<p>第五：指定继任代理人（可选）</p><p>如果我的代理人无法或不愿意为我行事，我指定以下人士为继任代理人：<br>继任代理人姓名：${F(a.succ1,220)}<br>继任代理人地址：${F(A(a.succ1addr),260)}</p><p>如果我的继任代理人无法或不愿意为我行事，我指定以下人士为第二继任代理人：<br>第二继任代理人姓名：${F(a.succ2,220)}<br>第二继任代理人地址：${F(A(a.succ2addr),260)}</p>`));
+    const yes = a.cons==='yes';
+    const bondBe = `<span class="ck">${yes&&a.bond==='be'?'✓':''}</span>`, bondNot = `<span class="ck">${yes&&a.bond==='not'?'✓':''}</span>`;
+    B.push(X(`<p>Sixth: DESIGNATION OF CONSERVATOR OF ESTATE (OPTIONAL)</p><p>If a conservator of my estate should be appointed, I designate that ${F(yes?a.cons1:'',180)} be appointed to serve as conservator of my estate. If ${F(yes?a.cons1:'',160)} is unable to serve or cease to serve as conservator of my estate, I designate that ${F(yes?a.cons2:'',180)} be appointed to serve as conservator of my estate.</p><p>I direct that bond for the conservator of my estate, including any sureties thereon ${bondBe}be required ${bondNot}not be required.</p>`,
+      `<p>第六：指定财产监护人（可选）</p><p>如果需要为我指定财产监护人，我指定由 ${F(yes?a.cons1:'',160)} 担任我的财产监护人。如果 ${F(yes?a.cons1:'',140)} 无法担任或停止担任我的财产监护人，我指定由 ${F(yes?a.cons2:'',160)} 担任我的财产监护人。</p><p>我指示，财产监护人的保证金（包括其担保人）${bondBe}须提供 ${bondNot}无须提供。</p>`));
+    B.push(X(`<p>Seventh: EFFECTIVE DATE</p><p>This power of attorney is effective immediately unless I have stated otherwise in the special instructions.</p><p>The execution of this statutory short form power of attorney shall be duly acknowledged by the principal in the manner prescribed for the acknowledgment of a conveyance of real property.</p>`,
+      `<p>第七：生效日期</p><p>本授权书立即生效，除非我在特别说明中另有规定。</p><p>本法定短版授权书的签署，应由授权人按照不动产转让认证的规定方式正式确认（公证）。</p>`));
+    B.push(X(`<p>In Witness Whereof I have hereunto signed my name and affixed my seal this <span class="blank" style="min-width:40px"></span> day of <span class="blank" style="min-width:100px"></span>, 20<span class="blank" style="min-width:24px"></span>.</p>`,
+      `<p>为此，我于 20<span class="blank" style="min-width:24px"></span> 年 <span class="blank" style="min-width:40px"></span> 月 <span class="blank" style="min-width:40px"></span> 日在此签名并盖印。</p>`) + `<div class="sig">${sigCell(X('Signature of Principal (Seal)','授权人签名（盖印）'))}<div class="siglbl" style="padding-top:14px">${X('Printed name','印刷体姓名')}: <b>${esc(a.name||'')}</b></div></div>`);
+    B.push(`<div class="sig">${sigCell(X('Witness','见证人'))}${sigCell(X('Witness','见证人'))}${sigCell(X('Printed name','印刷体姓名'))}${sigCell(X('Printed name','印刷体姓名'))}</div>`);
+    B.push(X(`<p style="margin-top:12px">STATE OF <span class="blank"></span> &nbsp;}&nbsp; ss: <span class="blank" style="min-width:90px"></span><br>COUNTY OF <span class="blank"></span></p><p>On this the <span class="blank" style="min-width:40px"></span> day of <span class="blank" style="min-width:100px"></span>, 20<span class="blank" style="min-width:24px"></span>, before me, ${F(a.name,200)}, signer of the foregoing instrument, personally appeared, and acknowledged the execution of such instrument to be his/her free act and deed.</p>`,
+      `<p style="margin-top:12px"><span class="blank"></span> 州 &nbsp;}&nbsp; ss: <span class="blank" style="min-width:90px"></span><br><span class="blank"></span> 县</p><p>20<span class="blank" style="min-width:24px"></span> 年 <span class="blank" style="min-width:40px"></span> 月 <span class="blank" style="min-width:40px"></span> 日，上述文件的签署人 ${F(a.name,160)} 亲自到我面前，承认签署该文件是其本人的自愿行为。</p>`) + `<div class="sig">${sigCell(X('Commissioner of the Superior Court / Notary Public','高等法院专员 / 公证人'))}${sigCell(X('My commission expires','执照到期日'))}</div>`);
+    if(zh) return {blocks:B};
+    const struck = (a.strike||[]);
+    const strikeTxt = struck.length ? '签名前，请亲手在以下项目的文字上<b>划一条线</b>，并在右侧括号里写上您的姓名缩写：'+struck.map(s=>'('+s+')').join('、')+'，以及 (N)。' : '您选择了授权全部 (A)–(N) 项，所以不需要划掉任何项目。右侧括号保持空白即可。';
+    const strikeEn = struck.length ? 'Before signing, draw a line through the text of, and write your initials in the box beside: '+struck.map(s=>'('+s+')').join(', ')+' and (N).' : 'You are granting all powers (A)–(N). Do not strike anything; leave the boxes blank.';
+    const ins = instructionBlocks('Durable Statutory Power of Attorney – Short Form (Conn. Gen. Stat. § 1-352)', [
+      [strikeTxt, strikeEn],
+      ['找两位见证人和一位公证人（Notary Public）。银行、UPS 店、律师事务所通常都有公证服务。<b>代理人不要当见证人。</b>','You need two witnesses and a notary public (banks, UPS stores and law offices often offer notary service). Your agent should not act as a witness.'],
+      ['在三人面前签名并写日期，两位见证人随后签名并写上印刷体姓名，公证人最后填写公证部分。','Sign and date in front of them; the witnesses sign and print their names; the notary completes the acknowledgment.'],
+      ['如果代理人将来要用这份授权书处理房地产，可能需要到房产所在镇的 Town Clerk 登记（record）。','If your agent will use it for real estate, it may need to be recorded with the Town Clerk where the property is located.'],
+      ['把原件交给代理人，或告诉代理人原件放在哪里。日后想撤销，请书面撤销并通知代理人和相关银行。','Give the original to your agent or tell them where it is kept. To revoke, do so in writing and notify your agent and institutions.']
+    ].concat(a.revoke==='all' ? [
+      ['这份授权书撤销了您以前所有的财务授权书。请<b>书面通知以前的代理人</b>，收回旧文件，并通知曾经收过旧授权书的银行和机构，否则他们可能继续按旧授权书办事。','This document revokes your earlier powers of attorney. Notify your former agents in writing, collect the old documents, and tell any bank or institution that has a copy; otherwise they may continue to rely on it.']
+    ] : []));
+    return {blocks:B, instructions:ins, file:'Power-of-Attorney-CT'};
+  }
+});
+
+/* ---------- 3. HIPAA AUTHORIZATION ---------- */
+DOCS.push({
+  id:'hipaa',
+  name:{zh:'病历授权书', en:'HIPAA Authorization'},
+  official:'Authorization for Use and Disclosure of Protected Health Information (HIPAA Authorization)',
+  tag:{zh:'让家人能查看您的医疗信息', en:'Let family access your medical information'},
+  card:{zh:'授权家人或代理人向医院、医生、保险公司查询您的病历和医疗信息。没有它，医院可能拒绝透露病情。',
+        en:'Authorize family members or agents to obtain your medical records and information from hospitals, doctors and insurers. Without it, providers may refuse to share details.'},
+  statute:'45 C.F.R. § 164.508',
+  intro:{
+    purpose:{zh:'因为联邦隐私法 HIPAA，医院和医生<b>不能随便把病情告诉别人</b>，连子女、配偶打电话去问都可能被拒绝。签了这份授权书，您指定的人就可以查看病历、和医生沟通、处理医疗账单和保险理赔。它也让您的医疗代表和财务代理人能拿到做决定需要的信息（例如证明您已失去行为能力）。',
+             en:'Under the federal privacy law HIPAA, hospitals and doctors <b>cannot freely share your health information</b> — even your spouse or children may be turned away. With this authorization, the people you name can see your records, talk with your doctors, and handle medical bills and insurance claims. It also gives your health care representative and financial agent the information they need to act (for example, proof that you are incapacitated).'},
+    who:{zh:'所有成年人，特别是有年长父母、子女在外地，或已经签了医疗预嘱、授权书的人。',
+         en:'Every adult — especially older adults, families living far apart, and anyone who has signed an advance directive or power of attorney.'},
+    effective:[
+      {zh:'打印后签名、写日期，<b>签了就生效</b>，不需要见证人或公证。', en:'Sign and date it — <b>it is effective once signed</b>. No witness or notary is required.'},
+      {zh:'少数医院要求用他们自己的表格。如果遇到这种情况，带着这份文件去问，通常都能接受，或者现场再签一份医院的表格。', en:'A few providers prefer their own form. This one meets federal requirements, but you may be asked to sign theirs as well.'},
+      {zh:'把副本交给您授权的人，也给家庭医生一份存档。', en:'Give copies to the people you name and to your doctor.'},
+      {zh:'随时可以书面撤销。', en:'You can revoke it in writing at any time.'}
+    ],
+    need:[{zh:'被授权人的英文全名、关系、电话', en:'Names, relationships and phone numbers of the people you authorize'},{zh:'约 5 分钟', en:'About 5 minutes'}]
+  },
+  steps:[
+    {title:{zh:'关于您', en:'About you'}, fields:[
+      {k:'name', t:'text', nm:true, shared:'name', label:{zh:'您的英文全名', en:'Your full legal name'}, req:true},
+      {k:'dob', t:'date', shared:'dob', label:{zh:'出生日期', en:'Date of birth'}, req:true},
+      {k:'addr', t:'address', shared:'addr', label:{zh:'您的地址', en:'Your address'}, req:true}
+    ]},
+    {title:{zh:'授权给谁', en:'Who may receive your information'}, fields:[
+      {k:'people', t:'rows', label:{zh:'被授权人（最多 5 位）', en:'Authorized persons (up to 5)'}, req:true, max:5, cols:[
+        {k:'n', label:{zh:'英文全名（照证件拼写）', en:'Full name (as on ID)'}, ph:'Mei Ling Wang'},{k:'r', label:{zh:'关系', en:'Relationship'}, ph:'Daughter'},{k:'p', label:{zh:'电话', en:'Phone'}}]},
+    ]},
+    {title:{zh:'哪些机构可以提供', en:'Who may disclose'}, fields:[
+      {k:'src', t:'radio', label:{zh:'谁可以把您的信息透露给上述人员？', en:'Who may disclose your information to these people?'}, req:true, opts:[
+        {v:'all', zh:'所有曾为我提供治疗或服务的医生、医院、诊所、药房、化验室、保险公司等（推荐）', en:'Any doctor, hospital, clinic, pharmacy, lab, insurer, etc. that has treated or served me (recommended)'},
+        {v:'list', zh:'只限以下机构', en:'Only the providers I list'}]},
+      {k:'srcRows', t:'rows', label:{zh:'请逐一添加可以提供您信息的机构或人员', en:'Add each provider or organization that may disclose your information'}, help:{zh:'照病历、保险卡或药瓶上的英文名称填写即可，不需要翻译，也不需要电话和地址。同名的连锁机构可以加上城市来区分。', en:'Use the name as it appears on your records, insurance card or prescription label. No phone or address needed; add the city if there are several locations with the same name.'}, show:a=>a.src==='list', req:true, max:15, cols:[
+        {k:'n', label:{zh:'名称', en:'Name'}, ph:'Hartford Hospital'},
+        {k:'t', label:{zh:'类型', en:'Type'}, t:'select', opts:PROVIDER_TYPES},
+        {k:'c', label:{zh:'城市（选填）', en:'City (optional)'}, ph:'Hartford'}]}
+    ]},
+    {title:{zh:'信息范围与期限', en:'Scope and expiration'}, fields:[
+      {k:'special', t:'checks', label:{zh:'以下特别受保护的信息，是否也一并授权？', en:'Also include these specially protected categories?'}, help:{zh:'这些信息依法需要您特别同意才能透露。不勾选就不包括在内。', en:'The law requires your specific consent for these. Unchecked categories are not included.'}, opts:[
+        {v:'mh', zh:'心理健康信息（不含心理治疗笔记）', en:'Mental health information (excluding psychotherapy notes)'},
+        {v:'sud', zh:'酒精或药物成瘾治疗记录', en:'Alcohol / substance use disorder treatment records'},
+        {v:'hiv', zh:'HIV/艾滋病相关信息', en:'HIV/AIDS-related information'},
+        {v:'gen', zh:'基因检测信息', en:'Genetic testing information'}]},
+      {k:'exp', t:'radio', label:{zh:'授权有效期至：', en:'This authorization expires:'}, req:true, opts:[
+        {v:'death', zh:'我身故后两年（方便家人处理身后医疗账单和理赔）', en:'Two years after my death (lets family settle final bills and claims)'},
+        {v:'date', zh:'指定日期', en:'On a specific date'}]},
+      {k:'expDate', t:'date', label:{zh:'到期日', en:'Expiration date'}, show:a=>a.exp==='date', req:true}
+    ]}
+  ],
+  build(a, zh=false){
+    const X = (en, c) => zh ? c : en;
+    const B=[];
+    const sp = a.special||[];
+    B.push(X(`<div class="ttl">AUTHORIZATION FOR USE AND DISCLOSURE OF<br>PROTECTED HEALTH INFORMATION<br><span style="font-weight:400">(HIPAA Authorization – 45 C.F.R. § 164.508)</span></div>`,
+      `<div class="ttl">使用和披露受保护健康信息授权书<br><span style="font-weight:400">（HIPAA 授权书 – 45 C.F.R. § 164.508）</span></div>`));
+    B.push(X(`<p><b>Patient:</b> ${F(a.name,220)} &nbsp;&nbsp; <b>Date of birth:</b> ${F(usDate(a.dob),110)}<br><b>Address:</b> ${F(A(a.addr),320)}</p>`,
+      `<p><b>病人：</b>${F(a.name,220)} &nbsp;&nbsp; <b>出生日期：</b>${F(usDate(a.dob),110)}<br><b>地址：</b>${F(A(a.addr),320)}</p>`));
+    B.push(`<h4>${X('1. Who may disclose my information','1. 谁可以披露我的信息')}</h4>`);
+    if(a.src==='list'){
+      const rows = (a.srcRows||[]).filter(r=>filled(r.n));
+      B.push(X(`<p>I authorize the following health care providers and health plans to use and disclose my protected health information as described below:</p>`,
+        `<p>我授权以下医疗服务提供者和健康计划，按下文所述使用和披露我受保护的健康信息：</p>`));
+      B.push(`<table><tr><th style="width:46%">${X('Name','名称')}</th><th>${X('Type','类型')}</th><th>${X('City','城市')}</th></tr>${rows.map(r=>`<tr><td>${esc(r.n)}</td><td>${esc((PROVIDER_TYPES.find(o=>o.v===r.t)||{})[zh?'zh':'en']||'')}</td><td>${esc(r.c||'')}</td></tr>`).join('')}</table>`);
+    }
+    else B.push(X(`<p>I authorize any physician, advanced practice registered nurse, health care professional, hospital, clinic, laboratory, pharmacy, pharmacy benefit manager, health plan, insurance company, long-term care facility, home health agency, or other covered entity under HIPAA that has provided or is providing treatment, services, or payment to me, to use and disclose my protected health information as described below.</p>`,
+      `<p>我授权任何曾经或正在为我提供治疗、服务或付款的医生、高级执业注册护士、医疗专业人员、医院、诊所、化验室、药房、药房福利管理机构、健康计划、保险公司、长期护理机构、居家护理机构，或 HIPAA 规定的其他受规管实体，按下文所述使用和披露我受保护的健康信息。</p>`));
+    B.push(`<h4>${X('2. Who may receive my information','2. 谁可以接收我的信息')}</h4>`);
+    const ppl = (a.people||[]).filter(p=>filled(p.n));
+    B.push(`<table><tr><th style="width:40%">${X('Name','姓名')}</th><th>${X('Relationship','关系')}</th><th>${X('Telephone','电话')}</th></tr>${(ppl.length?ppl:[{},{}]).map(p=>`<tr><td>${esc(p.n||'')}&nbsp;</td><td>${esc(p.r||'')}</td><td>${esc(p.p||'')}</td></tr>`).join('')}</table>`);
+    B.push(X(`<p>Each person named above may receive my information individually, and may discuss my health care, treatment and payment with my providers and health plans.</p>`,
+      `<p>上列每一位人士都可以单独接收我的信息，并可以与我的医疗服务提供者和健康计划讨论我的医疗、治疗和付款事宜。</p>`));
+    B.push(`<h4>${X('3. Information to be disclosed','3. 要披露的信息')}</h4>` + X(`<p>All of my individually identifiable health information, including medical records, diagnoses, test results, treatment information, prescriptions, billing and payment records, and any information concerning my capacity to make decisions, whether created before or after the date of this authorization.</p>`,
+      `<p>我所有可识别个人身份的健康信息，包括病历、诊断、检验结果、治疗信息、处方、账单和付款记录，以及关于我决策能力的任何信息，无论是在本授权书签署日期之前或之后产生的。</p>`));
+    const lines = [['mh','Mental health information (this does not include psychotherapy notes)','心理健康信息（不包括心理治疗笔记）'],['sud','Alcohol and substance use disorder treatment records','酒精及物质使用障碍治疗记录'],['hiv','HIV/AIDS-related information (including confidential HIV-related information under Conn. Gen. Stat. § 19a-583)','HIV/艾滋病相关信息（包括康州法规第 19a-583 条规定的 HIV 相关保密信息）'],['gen','Genetic testing information','基因检测信息']];
+    B.push(X(`<p style="margin-bottom:4px">I specifically authorize disclosure of the following categories (initial each category to be included):</p>`, `<p style="margin-bottom:4px">我特别授权披露以下类别（每一项要包括的类别，请写上姓名缩写）：</p>`)
+      + lines.map(l=>`<p class="indent" style="margin-bottom:4px"><span class="ck">${sp.includes(l[0])?'✓':''}</span>${zh?l[2]:l[1]} &nbsp; ${X('Initials','缩写')}: <span class="blank" style="min-width:50px"></span></p>`).join('')
+      + `<p class="note">${X('Categories not checked are NOT authorized for disclosure.','未勾选的类别不授权披露。')}</p>`);
+    B.push(`<h4>${X('4. Purpose','4. 目的')}</h4>` + X(`<p>At my request, and to permit the person(s) named above to communicate with my health care providers, to assist with or make decisions about my health care, and to handle insurance, billing and financial matters on my behalf.</p>`,
+      `<p>应我的要求，并让上列人士能够与我的医疗服务提供者沟通、协助或作出关于我医疗的决定，以及代我处理保险、账单和财务事宜。</p>`));
+    B.push(`<h4>${X('5. Expiration','5. 有效期')}</h4>` + X(`<p>This authorization expires ${a.exp==='date'?'on '+F(usDate(a.expDate),120):'two (2) years after the date of my death'}.</p>`,
+      `<p>本授权书${a.exp==='date'?'于 '+F(usDate(a.expDate),120)+' 失效':'于我死亡之日起两 (2) 年后失效'}。</p>`));
+    B.push(`<h4>${X('6. My rights','6. 我的权利')}</h4>` + X(`<ul><li>I may revoke this authorization at any time by giving written notice to the provider or health plan holding my information, except to the extent action has already been taken in reliance on it.</li><li>My treatment, payment, enrollment or eligibility for benefits will not be conditioned on whether I sign this authorization.</li><li>Information disclosed under this authorization may be redisclosed by the recipient and may no longer be protected by federal privacy regulations. Records protected by 42 C.F.R. Part 2 or state law may not be redisclosed except as permitted by those laws.</li><li>I am entitled to a copy of this signed authorization. A photocopy or electronic copy of this authorization shall be as valid as the original.</li></ul>`,
+      `<ul><li>我可以随时以书面通知持有我信息的医疗服务提供者或健康计划，撤销本授权书，但已依赖本授权书采取的行动除外。</li><li>我的治疗、付款、参保或福利资格，不会因我是否签署本授权书而受影响。</li><li>依本授权书披露的信息可能被接收者再次披露，并可能不再受联邦隐私法规保护。受 42 C.F.R. 第 2 部分或州法律保护的记录，除非这些法律允许，否则不得再次披露。</li><li>我有权获得本签署授权书的副本。本授权书的复印件或电子副本与原件同样有效。</li></ul>`));
+    B.push(`<div class="sig">${sigCell(X('Signature of patient','病人签名'))}${sigCell(X('Date','日期'))}<div class="siglbl">${X('Printed name','印刷体姓名')}: <b>${esc(a.name||'')}</b></div></div>`);
+    if(zh) return {blocks:B};
+    const ins = instructionBlocks('HIPAA Authorization', [
+      ['在 "Signature of patient" 处签名并写日期。'+(sp.length?'在您勾选的特别信息类别旁边写上您的姓名缩写。':''), 'Sign and date at "Signature of patient". '+(sp.length?'Write your initials next to each special category you checked.':'')],
+      ['不需要见证人或公证。少数机构要求公证，必要时可以再去公证。','No witness or notary is required, although a few institutions may ask for notarization.'],
+      ['把副本交给每一位被授权人和您的家庭医生。复印件与原件同样有效。','Give copies to each person named and to your doctor. Copies are as valid as the original.'],
+      ['想撤销时，书面通知相关医院或医生即可。','To revoke, give written notice to the provider or health plan.']
+    ]);
+    return {blocks:B, instructions:ins, file:'HIPAA-Authorization'};
+  }
+});
+
+/* ---------- 4. FINAL WISHES LETTER ---------- */
+DOCS.push({
+  id:'final-wishes',
+  name:{zh:'最终意愿信', en:'Final Wishes Letter'},
+  official:'Letter of Final Wishes',
+  tag:{zh:'丧礼与身后安排 · 可用中文填写', en:'Funeral and memorial wishes · any language'},
+  card:{zh:'写下您对丧礼、安葬或火化、宗教仪式、讣告的心愿，以及想对家人说的话。让家人在最难过的时候不用猜。',
+        en:'Write down your wishes for your funeral, burial or cremation, religious customs and obituary — and what you want to say to your family — so they never have to guess.'},
+  intro:{
+    purpose:{zh:'这是一封写给家人的信，说明您希望怎样被送别：土葬还是火化、在哪里、什么宗教或文化仪式、想请谁、讣告怎么写，以及想对家人说的话。家人在悲伤和忙乱中，最怕的就是"不知道爸妈想要什么"，也最容易为此产生分歧。',
+             en:'A letter to your family describing how you want to be remembered: burial or cremation, where, which religious or cultural customs, who to invite, what the obituary should say, and the words you want to leave them. In a time of grief, not knowing what a parent wanted is one of the hardest things for a family — and a common source of conflict.'},
+    who:{zh:'所有人。对子女不止一个、或者家族有不同宗教习俗的家庭尤其有帮助。', en:'Everyone — especially families with several children or with different religious traditions.'},
+    effective:[
+      {zh:'这封信<b>没有法律约束力</b>，不需要见证或公证，签名并写日期就可以。', en:'This letter is <b>not legally binding</b>. No witness or notary is needed; just sign and date it.'},
+      {zh:'它<b>不能代替遗嘱</b>。财产分配请写在遗嘱里，不要写在这封信里。', en:'It <b>does not replace a will</b>. Do not use it to leave property.'},
+      {zh:'把信放在家人容易找到的地方，并告诉至少一位家人信放在哪里。<b>不要只放在保险箱里</b>，丧礼往往在打开保险箱之前就办完了。', en:'Keep it where your family can find it quickly and tell at least one person where it is. <b>Do not keep it only in a safe-deposit box</b> — funerals often happen before the box is opened.'},
+      {zh:'可以随时重写，写上新日期即可。', en:'Rewrite it any time; just date the new version.'}
+    ],
+    need:[{zh:'可以用中文或英文填写', en:'You may write in English, Chinese or any language'},{zh:'想写多少写多少，不需要的题目可以留空', en:'Write as much or as little as you like; skip any question'},{zh:'约 15–30 分钟', en:'About 15–30 minutes'}]
+  },
+  steps:[
+    {title:{zh:'基本信息', en:'About you'}, fields:[
+      {k:'name', t:'text', prefill:'name', label:{zh:'您的姓名（中英文都可以）', en:'Your name'}, req:true},
+      {k:'to', t:'text', label:{zh:'这封信写给谁？', en:'Who is this letter to?'}, ph:{zh:'亲爱的家人',en:'My dear family'}}
+    ]},
+    {title:{zh:'遗体安排', en:'Disposition'}, fields:[
+      {k:'disp', t:'radio', label:{zh:'您希望：', en:'I wish to have:'}, opts:[
+        {v:'Burial',zh:'土葬',en:'Burial'},{v:'Cremation',zh:'火化',en:'Cremation'},{v:'Green / natural burial',zh:'环保自然葬',en:'Green / natural burial'},{v:'Donation of my body to medical science',zh:'遗体捐献给医学研究',en:'Donation of my body to medical science'},{v:'Family may decide',zh:'由家人决定',en:'My family may decide'}]},
+      {k:'place', t:'textarea', label:{zh:'安葬地点或骨灰安排', en:'Burial place or what to do with ashes'}, ph:{zh:'例如：与先父合葬于……墓园；骨灰撒在……；运回家乡……',en:'e.g. Next to my husband at Fairview Cemetery; scatter my ashes at…'}},
+      {k:'prepaid', t:'textarea', label:{zh:'是否已预购墓地或预付殡葬服务？资料在哪里？', en:'Any pre-purchased plot or prepaid funeral plan? Where are the papers?'}, ph:{zh:'例如：已在 ABC Funeral Home 预付，合同在书房文件柜第二格',en:'e.g. Prepaid at ABC Funeral Home; contract in the study file cabinet, 2nd drawer'}}
+    ]},
+    {title:{zh:'仪式', en:'Service'}, fields:[
+      {k:'svc', t:'radio', label:{zh:'仪式形式', en:'Type of service'}, opts:[
+        {v:'Traditional funeral with viewing',zh:'传统丧礼（含瞻仰遗容）',en:'Traditional funeral with viewing'},{v:'Memorial service',zh:'追思会',en:'Memorial service'},{v:'Private family gathering only',zh:'只要家人私下聚会',en:'Private family gathering only'},{v:'No service',zh:'不举行仪式',en:'No service'},{v:'Family may decide',zh:'由家人决定',en:'My family may decide'}]},
+      {k:'religion', t:'textarea', label:{zh:'宗教或文化习俗', en:'Religious or cultural customs'}, ph:{zh:'例如：基督教追思礼拜，请某某牧师主持；佛教诵经；按家乡习俗守灵三天；不需要烧纸……',en:'e.g. Christian memorial service led by Pastor Lee; Buddhist chanting; traditional three-day vigil…'}},
+      {k:'details', t:'textarea', label:{zh:'仪式细节：音乐、经文或诗歌、致辞人、穿着、花', en:'Details: music, readings, speakers, dress, flowers'}},
+      {k:'donate', t:'text', label:{zh:'"以捐款代替送花"的机构（可选）', en:'In lieu of flowers, donations to (optional)'}}
+    ]},
+    {title:{zh:'讣告与通知', en:'Obituary and notifications'}, fields:[
+      {k:'obit', t:'textarea', label:{zh:'讣告想写的内容（生平、成就、想被记住的样子）', en:'What your obituary should say (life story, achievements, how you want to be remembered)'}},
+      {k:'notify', t:'textarea', label:{zh:'请务必通知的人或团体（教会、同乡会、老同学……）', en:'People or groups to notify (church, community associations, old friends…)'}}
+    ]},
+    {title:{zh:'想说的话', en:'Personal messages'}, fields:[
+      {k:'msg', t:'textarea', label:{zh:'想对家人说的话', en:'Messages to your loved ones'}, help:{zh:'这部分完全属于您。可以写感谢、叮嘱、回忆，或者对每个孩子说一句话。', en:'This part is entirely yours: thanks, advice, memories, or a few words for each child.'}},
+      {k:'items', t:'textarea', label:{zh:'有纪念意义的小物件的心愿（非法律效力）', en:'Wishes for keepsakes (not legally binding)'}, help:{zh:'例如：希望把爷爷的手表留给长孙。有价值的财产请写进遗嘱。', en:'e.g. Grandpa\'s watch to my eldest grandson. Leave valuable property in your will.'}}
+    ]}
+  ],
+  build(a){
+    const B=[];
+    B.push(`<div class="ttl">LETTER OF FINAL WISHES${LANG==='en'?'':'<br><span style="font-weight:400;font-size:13px">最终意愿信</span>'}</div>`);
+    B.push(`<p class="note">This letter expresses my personal wishes. It is not a will and is not legally binding; it does not transfer any property.${T(' 本信表达我的个人心愿，不是遗嘱，不具法律约束力，也不处分任何财产。','')}</p>`);
+    B.push(`<p>${esc(a.to || T('致我的家人','To my family'))}${/[㐀-鿿]$/.test(a.to||T('家人',''))?'：':','}</p>`);
+    const sec = (title, v) => { if(filled(v)){ B.push(`<h4>${title}</h4>`); paras(v).forEach(p=>B.push(p)); } };
+    if(filled(a.disp)) B.push(`<h4>${PB('Disposition','遗体安排')}</h4><p>${esc(a.disp)}</p>`);
+    sec(PB('Burial place / ashes','安葬地点'), a.place);
+    sec(PB('Pre-arrangements','预先安排'), a.prepaid);
+    if(filled(a.svc)) B.push(`<h4>${PB('Service','仪式')}</h4><p>${esc(a.svc)}</p>`);
+    sec(PB('Religious and cultural customs','宗教与文化习俗'), a.religion);
+    sec(PB('Service details','仪式细节'), a.details);
+    if(filled(a.donate)) B.push(`<h4>${PB('In lieu of flowers','以捐款代替送花')}</h4><p>${esc(a.donate)}</p>`);
+    sec(PB('Obituary','讣告'), a.obit);
+    sec(PB('Please notify','请通知'), a.notify);
+    sec(PB('Keepsakes','纪念物品'), a.items);
+    sec(PB('My messages to you','我想对你们说'), a.msg);
+    B.push(`<div class="sig" style="margin-top:24px">${sigCell(PB('Signature','签名'))}${sigCell(PB('Date','日期'))}<div class="siglbl">${esc(a.name||'')}</div></div>`);
+    const ins = instructionBlocks('Letter of Final Wishes', [
+      ['签名并写日期即可，不需要见证或公证。','Sign and date it. No witness or notary is needed.'],
+      ['告诉至少一位家人这封信放在哪里，或直接给遗嘱执行人一份副本。','Tell at least one family member where it is, or give a copy to your executor.'],
+      ['如果信中内容与遗嘱有冲突，以遗嘱为准。','If anything here conflicts with your will, the will controls.']
+    ]);
+    return {blocks:B, instructions:ins, file:'Final-Wishes-Letter'};
+  }
+});
+
+/* ---------- 5. LETTER OF INSTRUCTION ---------- */
+const DOC_TYPES = [['Will','遗嘱'],['Trust','信托'],['Power of Attorney','授权书'],['Advance Directive','医疗预嘱'],['HIPAA Authorization','病历授权'],['Life insurance policies','寿险保单'],['Annuity contracts','年金合同'],['Property deeds','房契'],['Vehicle titles','车辆所有权证'],['Tax returns','报税表'],['Birth / marriage certificates','出生/结婚证'],['Passports','护照'],['Safe-deposit box key','保险箱钥匙'],['Password list / manager','密码本或密码软件'],['Other','其他']].map(([en,zh])=>({v:en,zh,en}));
+DOCS.push({
+  id:'letter-of-instruction',
+  name:{zh:'指示信', en:'Letter of Instruction'},
+  official:'Letter of Instruction',
+  tag:{zh:'家庭财务"导航图" · 可用中文填写', en:'A roadmap for your family · any language'},
+  card:{zh:'告诉家人：重要文件放在哪里、有哪些银行账户和保单、该联系谁、每月有哪些账单要付。是给遗嘱执行人的"使用说明书"。',
+        en:'Tell your family where your important papers are, which accounts and policies you have, who to call, and which bills to pay — a user\'s manual for your executor.'},
+  intro:{
+    purpose:{zh:'遗嘱说的是"给谁"，指示信说的是"在哪里、怎么找"。很多家庭在亲人过世或住院后，花几个月才找齐银行账户、保单、退休账户，有些保险金甚至一直没人领取。这封信把所有线索整理在一处：重要联系人、文件存放位置、账户和保单清单、定期账单、数字账户，以及宠物和家人的照顾安排。',
+             en:'A will says <i>who</i> gets what; a letter of instruction says <i>where things are and how to find them</i>. Many families spend months tracking down bank accounts, policies and retirement accounts after a death or hospitalization — and some life insurance is never claimed at all. This letter gathers every lead in one place: key contacts, where documents are kept, accounts and policies, recurring bills, digital accounts, and care for dependents and pets.'},
+    who:{zh:'所有人，尤其是家里由一个人管钱的家庭。', en:'Everyone — especially households where one person handles the finances.'},
+    effective:[
+      {zh:'没有法律效力，签名并写日期即可，不需要见证或公证。', en:'It is not a legal document. Just sign and date it; no witness or notary.'},
+      {zh:'<b>为了安全，不要写完整的账号、社会安全号或密码。</b>账号只写最后 4 位，密码只写"密码本或密码管理软件放在哪里"。', en:'<b>For security, never write full account numbers, Social Security numbers or passwords.</b> Use only the last 4 digits, and say where your password list or manager is kept.'},
+      {zh:'把它和遗嘱、授权书放在一起，告诉遗嘱执行人或代理人放在哪里。', en:'Keep it with your will and power of attorney, and tell your executor or agent where it is.'},
+      {zh:'每年或有重大变化时更新一次。', en:'Review it every year or after any major change.'}
+    ],
+    need:[{zh:'手边的银行和投资账户月结单、保单', en:'Recent bank and investment statements and insurance policies'},{zh:'约 20–40 分钟，可以分几次完成（会自动保存在本机浏览器）', en:'About 20–40 minutes; you can finish in several sittings (answers are saved in this browser)'}]
+  },
+  steps:[
+    {title:{zh:'基本信息', en:'About you'}, fields:[
+      {k:'name', t:'text', prefill:'name', label:{zh:'您的姓名', en:'Your name'}, req:true},
+      {k:'executor', t:'text', label:{zh:'遗嘱执行人或代理人（如已指定）', en:'Your executor or agent (if named)'}},
+      {k:'about', t:'textarea', label:{zh:'其他基本信息（出生地、婚姻状况、曾用名、军人身份等）', en:'Other personal details (birthplace, marital status, former names, military service, etc.)'}}
+    ]},
+    {title:{zh:'重要联系人', en:'Key contacts'}, fields:[
+      {k:'contacts', t:'rows', label:{zh:'律师、会计师、理财顾问、保险经纪、家庭医生、雇主人事部、宗教领袖等', en:'Attorney, accountant, financial advisor, insurance agent, doctor, employer HR, clergy, etc.'}, max:12, cols:[
+        {k:'role', label:{zh:'角色', en:'Role'}, ph:'Attorney'},{k:'n', label:{zh:'姓名或公司', en:'Name / firm'}},{k:'p', label:{zh:'电话或邮箱', en:'Phone / email'}}]}
+    ]},
+    {title:{zh:'文件存放位置', en:'Where your documents are'}, fields:[
+      {k:'docs', t:'rows', label:{zh:'重要文件放在哪里？', en:'Where is each important document kept?'}, max:16, cols:[
+        {k:'d', label:{zh:'文件', en:'Document'}, t:'select', opts:DOC_TYPES},
+        {k:'w', label:{zh:'放在哪里', en:'Location'}, ph:{zh:'书房文件柜第二格',en:'Study file cabinet, 2nd drawer'}}]}
+    ]},
+    {title:{zh:'银行与投资账户', en:'Financial accounts'}, fields:[
+      {k:'accts', t:'rows', label:{zh:'银行、投资、退休账户（只写账号后 4 位）', en:'Bank, investment and retirement accounts (last 4 digits only)'}, max:16, cols:[
+        {k:'inst', label:{zh:'机构', en:'Institution'}, ph:'Chase'},{k:'type', label:{zh:'类型', en:'Type'}, ph:'Checking / IRA / 401(k)'},{k:'l4', label:{zh:'后4位', en:'Last 4'}},{k:'note', label:{zh:'备注（联名？有受益人？）', en:'Notes (joint? beneficiary?)'}}]}
+    ]},
+    {title:{zh:'保险与年金', en:'Insurance and annuities'}, fields:[
+      {k:'pols', t:'rows', label:{zh:'寿险、年金、长期护理险、团体保险等', en:'Life insurance, annuities, long-term care, group policies, etc.'}, max:12, cols:[
+        {k:'co', label:{zh:'保险公司', en:'Company'}},{k:'type', label:{zh:'类型', en:'Type'}, ph:'Term life / IUL / Annuity'},{k:'l4', label:{zh:'保单后4位', en:'Policy last 4'}},{k:'agent', label:{zh:'经纪人或联络电话', en:'Agent / phone'}}]}
+    ]},
+    {title:{zh:'账单、债务与其他', en:'Bills, debts and more'}, fields:[
+      {k:'bills', t:'textarea', label:{zh:'每月或定期账单、贷款、信用卡（哪些是自动扣款？）', en:'Recurring bills, loans and credit cards (which are on autopay?)'}},
+      {k:'digital', t:'textarea', label:{zh:'数字账户：邮箱、手机、社交媒体、网上银行。只写"密码在哪里找"以及您希望怎么处理这些账户', en:'Digital accounts: email, phone, social media, online banking. Only say where passwords can be found and what should happen to each account'}},
+      {k:'care', t:'textarea', label:{zh:'需要照顾的家人或宠物的安排', en:'Care arrangements for dependents or pets'}},
+      {k:'other', t:'textarea', label:{zh:'其他交代', en:'Anything else'}}
+    ]}
+  ],
+  build(a){
+    const B=[];
+    B.push(`<div class="ttl">LETTER OF INSTRUCTION${LANG==='en'?'':'<br><span style="font-weight:400;font-size:13px">指示信</span>'}</div>`);
+    B.push(`<p>${PB('Prepared by','本人')}: ${F(a.name,200)} ${filled(a.executor)?'&nbsp;&nbsp; '+PB('Executor / Agent','执行人/代理人')+': '+F(a.executor):''}</p>`);
+    B.push(`<p class="note">This letter is a guide for my family and executor. It is not a will and does not transfer property. Account numbers are partially shown for security.${T(' 本信为家人及遗嘱执行人提供指引，不是遗嘱。为安全起见，账号只显示后四位。','')}</p>`);
+    const sec = (title, v) => { if(filled(v)){ B.push(`<h4>${title}</h4>`); paras(v).forEach(p=>B.push(p)); } };
+    sec(PB('About me','关于我'), a.about);
+    const docLabel = v => { const o = DOC_TYPES.find(x=>x.v===v); return o ? PB(o.en, o.zh) : v; };
+    const tbl = (title, rows, cols) => {
+      const r = (rows||[]).filter(x=>cols.some(c=>filled(x[c[0]])));
+      if(!r.length) return;
+      B.push(`<h4>${title}</h4>`);
+      for(let i=0;i<r.length;i+=8){
+        B.push(`<table><tr>${cols.map(c=>`<th>${c[1]}</th>`).join('')}</tr>${r.slice(i,i+8).map(x=>`<tr>${cols.map(c=>`<td>${esc(c[2]?c[2](x[c[0]]||''):(x[c[0]]||''))}</td>`).join('')}</tr>`).join('')}</table>`);
+      }
+    };
+    tbl(PB('Key contacts','重要联系人'), a.contacts, [['role',PB('Role','角色')],['n',PB('Name','姓名')],['p',PB('Contact','联络方式')]]);
+    tbl(PB('Where to find my documents','文件存放位置'), a.docs, [['d',PB('Document','文件'),docLabel],['w',PB('Location','位置')]]);
+    tbl(PB('Financial accounts','银行与投资账户'), a.accts, [['inst',PB('Institution','机构')],['type',PB('Type','类型')],['l4',PB('Last 4','后四位')],['note',PB('Notes','备注')]]);
+    tbl(PB('Insurance & annuities','保险与年金'), a.pols, [['co',PB('Company','公司')],['type',PB('Type','类型')],['l4',PB('Policy last 4','后四位')],['agent',PB('Agent / phone','经纪人')]]);
+    sec(PB('Bills and debts','账单与债务'), a.bills);
+    sec(PB('Digital accounts','数字账户'), a.digital);
+    sec(PB('Dependents and pets','家人与宠物'), a.care);
+    sec(PB('Other instructions','其他交代'), a.other);
+    B.push(`<div class="sig" style="margin-top:22px">${sigCell(PB('Signature','签名'))}${sigCell(PB('Date','日期'))}</div>`);
+    const ins = instructionBlocks('Letter of Instruction', [
+      ['签名并写日期，与遗嘱等重要文件放在一起。','Sign, date, and store it with your estate documents.'],
+      ['复印一份给遗嘱执行人或财务代理人，或者告诉他们原件放在哪里。','Give a copy to your executor or agent, or tell them where it is.'],
+      ['再检查一遍：没有完整账号、社会安全号或密码。','Double-check: no full account numbers, Social Security numbers or passwords.'],
+      ['每年更新一次，例如报税之后。','Update it every year — for example, after tax season.']
+    ]);
+    return {blocks:B, instructions:ins, file:'Letter-of-Instruction'};
+  }
+});
+
+/* ---------- 6. BENEFICIARY REVIEW ---------- */
+const ACCT_TYPES = [['Life insurance','寿险'],['Annuity','年金'],['401(k) / 403(b)','401(k) / 403(b)'],['IRA / Roth IRA','IRA / Roth IRA'],['Bank account (POD)','银行账户 (POD)'],['Brokerage account (TOD)','券商账户 (TOD)'],['Pension','退休金'],['HSA','HSA 健康储蓄账户'],['529 Plan','529 教育计划'],['Other','其他']].map(([en,zh])=>({v:en,zh,en}));
+const BEN_STATUS = [
+  {v:'OK', zh:'没问题', en:'OK'},
+  {v:'Not sure', zh:'不确定', en:'Not sure'},
+  {v:'None named', zh:'没有指定', en:'None named'},
+  {v:'My estate', zh:'写的是"遗产"', en:'My estate is named'},
+  {v:'Minor child', zh:'受益人是未成年人', en:'Minor child named'},
+  {v:'Ex-spouse', zh:'受益人是前配偶', en:'Ex-spouse named'},
+  {v:'Deceased person', zh:'受益人已过世', en:'Beneficiary has died'},
+  {v:'Need to change', zh:'想更改', en:'I want to change it'}
+];
+const LIFE_EVENTS = [
+  {v:'Marriage',zh:'结婚',en:'Marriage'},{v:'Divorce or separation',zh:'离婚或分居',en:'Divorce or separation'},{v:'Birth or adoption of a child / grandchild',zh:'子女或孙辈出生、领养',en:'Birth or adoption of a child / grandchild'},{v:'Death of a named beneficiary',zh:'受益人过世',en:'Death of a named beneficiary'},{v:'A beneficiary with special needs or receiving government benefits',zh:'有特殊需要或领政府补助的家人',en:'A beneficiary with special needs or on government benefits'},{v:'Created a trust',zh:'设立了信托',en:'Created a trust'},{v:'Moved states / changed jobs',zh:'搬州或换工作',en:'Moved states / changed jobs'}];
+DOCS.push({
+  id:'beneficiary-review',
+  name:{zh:'受益人盘点表', en:'Beneficiary Review'},
+  official:'Beneficiary Designation Review Worksheet',
+  tag:{zh:'保单 · 年金 · 退休账户 · 银行', en:'Insurance · annuities · retirement · bank accounts'},
+  card:{zh:'把所有寿险、年金、401(k)/IRA、银行和券商账户的受益人列在一张表上，自动标出需要更新的地方。这是遗产规划的第一步。',
+        en:'List the beneficiaries on all your life insurance, annuities, 401(k)/IRA, bank and brokerage accounts in one worksheet, with automatic flags for anything that needs updating. The first step in estate planning.'},
+  intro:{
+    purpose:{zh:'很多人不知道：<b>保单、年金、退休账户、设有 TOD/POD 的银行和券商账户，钱是直接给"受益人表格"上写的人，不看遗嘱。</b>如果受益人还是前配偶、已过世的父母，或是未成年的孩子，遗嘱写得再好也没用。这张盘点表帮您逐一列出每个账户现在的受益人，自动提示常见问题，然后您再去向各家公司索取受益人变更表格。',
+             en:'Many people don\'t realize that <b>life insurance, annuities, retirement accounts, and bank or brokerage accounts with TOD/POD designations pay directly to whoever is named on the beneficiary form — regardless of your will.</b> If that is still an ex-spouse, a parent who has passed away, or a minor child, even a perfect will cannot fix it. This worksheet lists every account and its current beneficiaries, flags common problems, and tells you what to update with each company.'},
+    who:{zh:'所有拥有寿险、年金、401(k)/403(b)/IRA、银行或券商账户的人。结婚、离婚、生子、家人过世之后尤其要检查。', en:'Anyone with life insurance, annuities, a 401(k)/403(b)/IRA, or bank and brokerage accounts — especially after a marriage, divorce, birth or death in the family.'},
+    effective:[
+      {zh:'这是一张<b>自我检查表</b>，本身不会更改任何受益人。', en:'This is a <b>self-review worksheet</b>; it does not change any beneficiary by itself.'},
+      {zh:'对每一项标为"需要处理"的账户，向该公司索取 "Change of Beneficiary" 表格，或登录网上账户修改。', en:'For each flagged account, request a "Change of Beneficiary" form from that company or update it online.'},
+      {zh:'修改后，向公司要一份书面确认，存在这张表旁边。', en:'Ask for written confirmation and keep it with this worksheet.'},
+      {zh:'已婚人士注意：401(k) 等雇主退休计划如果要指定配偶以外的人，通常需要配偶书面同意。', en:'If you are married: employer plans such as a 401(k) usually require your spouse\'s written consent to name anyone else.'}
+    ],
+    need:[{zh:'各账户的月结单或保单（上面通常写有受益人，或登录网上账户查看）', en:'Statements or policies for each account (or log in online to see beneficiaries)'},{zh:'约 15 分钟', en:'About 15 minutes'}]
+  },
+  steps:[
+    {title:{zh:'基本信息', en:'About you'}, fields:[
+      {k:'name', t:'text', prefill:'name', label:{zh:'您的姓名', en:'Your name'}, req:true},
+      {k:'events', t:'checks', label:{zh:'最近几年您是否有以下变化？', en:'Have any of these happened in recent years?'}, opts:LIFE_EVENTS}
+    ]},
+    {title:{zh:'账户与受益人', en:'Accounts and beneficiaries'}, fields:[
+      {k:'rows', t:'rows', label:{zh:'逐一列出每个账户或保单', en:'List each account or policy'}, req:true, max:20, cols:[
+        {k:'type', label:{zh:'类型', en:'Type'}, t:'select', opts:ACCT_TYPES},
+        {k:'inst', label:{zh:'公司', en:'Company'}},
+        {k:'prim', label:{zh:'第一受益人及比例', en:'Primary beneficiary & %'}, ph:'Spouse 100%'},
+        {k:'cont', label:{zh:'后备受益人及比例', en:'Contingent beneficiary & %'}, ph:'Children equally'},
+        {k:'flag', label:{zh:'受益人情况', en:'Status'}, t:'select', opts:BEN_STATUS}
+      ]}
+    ]}
+  ],
+  build(a){
+    const B=[];
+    const rows = (a.rows||[]).filter(r=>filled(r.inst)||filled(r.prim)||filled(r.type));
+    const today = new Date().toLocaleDateString('en-US');
+    const lab = (list, v) => { const o = list.find(x=>x.v===v); return o ? PB(o.en, o.zh) : (v||''); };
+    B.push(`<div class="ttl">BENEFICIARY DESIGNATION REVIEW WORKSHEET${LANG==='en'?'':'<br><span style="font-weight:400;font-size:13px">受益人盘点表</span>'}</div>`);
+    B.push(`<p>${PB('Owner','账户持有人')}: ${F(a.name,200)} &nbsp;&nbsp; ${PB('Prepared','填写日期')}: <span class="fill">${today}</span></p>`);
+    B.push(`<p class="note">Beneficiary designations on life insurance, annuities, retirement plans and POD/TOD accounts generally pass outside the will. Review after every major life event.${T(' 保单、年金、退休账户及 TOD/POD 账户的受益人指定通常优先于遗嘱。','')}</p>`);
+    for(let i=0;i<rows.length;i+=10){
+      B.push(`<table><tr><th>#</th><th>${PB('Type','类型')}</th><th>${PB('Company','公司')}</th><th>${PB('Primary','第一受益人')}</th><th>${PB('Contingent','后备受益人')}</th><th>${PB('Status','情况')}</th></tr>${rows.slice(i,i+10).map((r,j)=>{const bad = r.flag && r.flag!=='OK'; return `<tr><td>${i+j+1}</td><td>${esc(lab(ACCT_TYPES,r.type))}</td><td>${esc(r.inst||'')}</td><td>${esc(r.prim||'')}</td><td>${esc(r.cont||'')}</td><td${bad?' class="flag"':''}>${esc(lab(BEN_STATUS,r.flag))}</td></tr>`}).join('')}</table>`);
+    }
+    const flagText = {
+      'None named':['没有指定受益人：钱通常会进入遗产，走遗产认证（probate），耗时且公开。','No beneficiary named: the money will likely pass through probate, which is slow and public.'],
+      'My estate':['受益人写的是"遗产"（Estate）：会走遗产认证，退休账户还可能失去延税的好处。','Your estate is named: the funds go through probate, and retirement accounts may lose tax-deferral benefits.'],
+      'Minor child':['受益人是未成年人：保险公司不能直接把钱付给未成年人，可能需要法院指定监护人。可以考虑设信托或指定 UTMA 托管人。','A minor is named: companies cannot pay a minor directly, so a court-appointed guardian may be needed. Consider a trust or a UTMA custodian.'],
+      'Ex-spouse':['受益人是前配偶：请确认这是否仍是您的意愿；离婚判决和联邦法规对此的处理不同，请尽快更新。','An ex-spouse is named: confirm this is still what you want — divorce decrees and federal rules treat this differently — and update promptly.'],
+      'Deceased person':['受益人已过世：请指定新的受益人，并检查后备受益人。','The beneficiary has died: name a new beneficiary and check the contingent.'],
+      'Not sure':['不确定受益人是谁：请联系该公司，或登录网上账户确认。','Beneficiary unknown: contact the company or log in online to confirm.'],
+      'Need to change':['想更改受益人：向该公司索取 Change of Beneficiary 表格。','Change wanted: request a Change of Beneficiary form from the company.']
+    };
+    const FL = [];
+    rows.forEach((r,i)=>{
+      const nm = `#${i+1} ${esc(r.inst||lab(ACCT_TYPES,r.type)||'')}`;
+      if(flagText[r.flag]) FL.push([nm, ...flagText[r.flag]]);
+      else if(!filled(r.cont) && filled(r.prim)) FL.push([nm, '没有后备受益人：如果第一受益人先于您过世，钱可能会进入遗产。','No contingent beneficiary: if the primary beneficiary dies before you, the money may go to your estate.']);
+    });
+    B.push(`<h4>${PB('Action items','需要处理的事项')}</h4>`);
+    if(FL.length) FL.forEach(f=>B.push(LANG==='en' ? `<p><span class="ck"></span><b>${f[0]}</b> — ${f[2]}</p>` : `<p><span class="ck"></span><b>${f[0]}</b> — ${f[1]}<br><span class="note">${f[2]}</span></p>`));
+    else B.push(`<p>${T('未发现明显问题。','No issues flagged.')}</p>`);
+    const ev = a.events||[];
+    if(ev.length){
+      B.push(`<h4>${PB('Life events to consider','需要留意的人生变化')}</h4><ul>${ev.map(e=>`<li>${esc(lab(LIFE_EVENTS,e))}</li>`).join('')}</ul>`);
+      if(ev.some(e=>/special needs/.test(e))) B.push(`<p class="flag">${T('如果受益人有特殊需要或在领政府补助，直接留钱给他可能导致补助资格被取消，请咨询律师设立特殊需要信托（Special Needs Trust）。','Leaving money directly to a beneficiary with special needs or on government benefits can disqualify them from those benefits. Consult an attorney about a special needs trust.')}</p>`);
+    }
+    B.push(`<h4>${PB('Confirmation log','修改确认记录')}</h4><table><tr><th>#</th><th>${PB('Change requested','申请日期')}</th><th>${PB('Confirmation received','收到确认')}</th><th>${PB('Notes','备注')}</th></tr>${[1,2,3,4].map(()=>'<tr><td>&nbsp;</td><td></td><td></td><td></td></tr>').join('')}</table>`);
+    const ins = instructionBlocks('Beneficiary Designation Review', [
+      ['对每个打勾待办的账户，向该公司索取受益人变更表（Change of Beneficiary Form），或者登录网上账户修改。','For each action item, get a Change of Beneficiary form from the company or update it online.'],
+      ['填写受益人时写全名、关系、比例，最好加上出生日期；比例加起来必须是 100%。','Use full names, relationships and percentages (totaling 100%), and ideally dates of birth.'],
+      ['务必同时指定后备受益人。','Always name contingent beneficiaries.'],
+      ['把公司寄来的确认信和这张表放在一起，每年或有人生变化时重新检查。','Keep each confirmation with this worksheet, and review it every year or after a major life event.']
+    ]);
+    return {blocks:B, instructions:ins, file:'Beneficiary-Review'};
+  }
+});
+
+const HOME_ORDER = ['beneficiary-review','advance-directive','hipaa','power-of-attorney','letter-of-instruction','final-wishes'];
+
+/* =========================================================
+   CHROME: header, footer, language toggle
+   ========================================================= */
+function renderChrome(){
+  document.documentElement.lang = LANG==='en' ? 'en' : 'zh-CN';
+  document.title = T('安心规划 · Plan Ahead CT', 'Plan Ahead CT · Estate Planning Documents');
+  $('#logo').innerHTML = LANG==='en' ? 'Plan Ahead CT' : '安心规划<small>Plan Ahead CT</small>';
+  $('#navall').textContent = T('全部文件', 'All documents');
+  $('#langbtn').textContent = LANG==='en' ? '中文' : 'English';
+  $('#langbtn').setAttribute('aria-label', LANG==='en' ? '切换到中文' : 'Switch to English');
+  if(typeof applyFS==='function' && document.getElementById('fsgrp')) try{applyFS();}catch(e){}
+  $('#foot').innerHTML = LANG==='en'
+    ? `<p><b>Important:</b> This website is a free self-help tool. It is <b>not a law firm and does not provide legal advice</b>. Documents follow Connecticut statutory forms or general templates and suit typical situations for Connecticut residents; if your situation is complex, please consult a Connecticut attorney. Using this site does not create an attorney–client relationship.</p><p>🔒 Your answers stay in your own browser and are never uploaded to any server.</p>`
+    : `<p><b>重要说明：</b>本网站是免费的自助工具，<b>不是律师事务所，不提供法律建议</b>。生成的文件依据康涅狄格州（Connecticut）法律的法定格式或通用模板，适用于康州居民的一般情况；您的情况如较复杂，请咨询康州执业律师。使用本网站不构成任何律师-客户关系。</p><p>🔒 您填写的内容只保存在您自己的浏览器中，不会上传到任何服务器。</p>`;
+}
+
+/* Text size (for older readers): 0 standard, 1 large, 2 extra large */
+let FS = 0; try { FS = +(localStorage.getItem('planahead-fs')||0) || 0; } catch(e){}
+function applyFS(){
+  document.body.classList.remove('fs-1','fs-2'); if(FS) document.body.classList.add('fs-'+FS);
+  const names = [T('标准字号','Standard text'), T('大字','Large text'), T('特大字','Extra large text')];
+  $('#fsgrp').setAttribute('aria-label', T('字体大小','Text size'));
+  document.querySelectorAll('#fsgrp button').forEach(b=>{ const i=+b.dataset.fs; b.setAttribute('aria-pressed', i===FS); b.title = names[i]; b.setAttribute('aria-label', names[i]); });
+}
+document.querySelectorAll('#fsgrp button').forEach(b=>b.addEventListener('click',()=>{ FS=+b.dataset.fs; try{localStorage.setItem('planahead-fs',FS);}catch(e){} applyFS(); if(VIEW.doc && VIEW.step===DOCS.find(x=>x.id===VIEW.doc).steps.length) drawPreview(DOCS.find(x=>x.id===VIEW.doc)); }));
+
+$('#langbtn').addEventListener('click', ()=>{
+  LANG = LANG==='en' ? 'zh' : 'en';
+  try { localStorage.setItem('planahead-lang', LANG); } catch(e){}
+  renderChrome();
+  const y = window.scrollY;
+  if(VIEW.doc){ const d = DOCS.find(x=>x.id===VIEW.doc); renderDoc(d); } else renderHome();
+  window.scrollTo(0, y);
+});
+
+/* =========================================================
+   ROUTER & VIEWS
+   ========================================================= */
+let VIEW = {doc:null, step:-1};
+let CUR_DOC = null; // step -1 = intro, steps.length = review
+
+function route(){
+  const h = location.hash.replace('#','') || 'home';
+  const d = DOCS.find(x=>x.id===h);
+  if(d){ if(VIEW.doc!==d.id) VIEW={doc:d.id, step:-1}; renderDoc(d); }
+  else { VIEW={doc:null,step:-1}; renderHome(); }
+  window.scrollTo(0,0);
+}
+window.addEventListener('hashchange', route);
+
+function renderHome(){
+  CUR_DOC = null;
+  const app = $('#app');
+  const screenItems = [
+    {zh:'再婚家庭，或有前段婚姻的子女', en:'A blended family, or children from a previous marriage'},
+    {zh:'有特殊需要、或正在领政府补助的家人', en:'A family member with special needs or on government benefits'},
+    {zh:'在美国以外（如中国、台湾、香港）有房产或账户', en:'Property or accounts outside the U.S.'},
+    {zh:'净资产可能超过康州遗产税免税额', en:'An estate that may exceed the Connecticut estate tax exemption'},
+    {zh:'拥有公司或生意', en:'You own a business'},
+    {zh:'担心家人会有争议，或有人可能对您施加不当影响', en:'You expect family disputes or worry about undue influence'},
+    {zh:'您或家人的记忆力、判断力已经开始衰退', en:'Concerns about memory or decision-making capacity'}
+  ];
+  const order = [
+    {zh:'<b>先做受益人盘点。</b>保单和退休账户的钱直接给受益人，不看遗嘱，这一步最容易被忽略。', en:'<b>Start with your beneficiary review.</b> Insurance and retirement accounts pay the named beneficiary regardless of your will — the most overlooked step.'},
+    {zh:'<b>签医疗预嘱和病历授权书。</b>万一住院，家人能马上替您做决定、了解病情。', en:'<b>Sign an advance directive and HIPAA authorization.</b> If you are hospitalized, your family can act and get information right away.'},
+    {zh:'<b>签财务授权书。</b>让信任的人能替您付账单、处理银行和房产。', en:'<b>Sign a durable power of attorney.</b> Someone you trust can pay bills and handle banking and property.'},
+    {zh:'<b>写指示信和最终意愿信。</b>给家人一份"地图"和您的心愿。', en:'<b>Write a letter of instruction and a final wishes letter.</b> Give your family a map — and your wishes.'},
+    {zh:'<b>遗嘱和信托请找律师。</b>本网站目前不提供遗嘱与信托。', en:'<b>See an attorney for a will or trust.</b> This site does not prepare wills or trusts.'}
+  ];
+  const pills = LANG==='en'
+    ? ['🔒 Nothing uploaded — everything stays on your device','📄 Connecticut statutory forms','🌐 English and Chinese','💲 Completely free']
+    : ['🔒 资料不上传，只在您的电脑上处理','📄 依照康州法定格式','🌐 中英文界面','💲 完全免费'];
+  app.innerHTML = `
+  <div class="hero">
+    <h1>${T('把重要的事，提前安排好','Plan ahead for what matters most')}</h1>
+    <p class="lead">${T('免费、简单、保护隐私。回答几个问题，生成符合<b>康涅狄格州（Connecticut）</b>格式的遗产规划文件 PDF，打印、签名后即可使用。','Free, simple and private. Answer a few questions and get <b>Connecticut</b>-ready estate planning documents as a PDF — print, sign, and you\'re done.')}</p>
+    <div class="pill-row">${pills.map(p=>`<span class="pill">${p}</span>`).join('')}</div>
+  </div>
+  <section class="block" id="profile">
+    <h2>${T('我的基本资料','My basic information')}</h2>
+    <p class="small" style="color:var(--muted)">${T('填一次，医疗预嘱、财务授权书、病历授权书会自动带入，不用重复填写。在任何一份文件里修改，也会同步到这里。资料只保存在这台电脑的浏览器里。','Fill this in once and it will be used automatically in the Advance Directive, Power of Attorney and HIPAA Authorization. Changes made in any of those documents are synced here. Stored only in this browser.')}</p>
+    <form id="pf" novalidate></form>
+    <div class="saveall">
+      <h3 style="margin:6px 0 4px">${T('保存或载入我的全部答案','Save or load all my answers')}</h3>
+      <p class="small" style="color:var(--muted);margin:0 0 8px">${T('一个档案包含基本资料和所有文件的答案。换电脑、请家人帮忙检查，或清除后想恢复时使用。档案里有您的个人资料，请妥善保管。','One file containing your basic information and the answers for every document. Use it to move to another computer, let family check your answers, or restore after clearing. It contains personal information, so keep it safe.')}</p>
+      <div class="btn-row" style="margin-top:0"><button type="button" class="btn" id="saveall" style="font-size:16px;padding:9px 16px">${T('⬇ 下载全部答案','⬇ Download all answers')}</button>
+      <label class="btn secondary" style="cursor:pointer;font-size:16px;padding:9px 16px">${T('⬆ 载入答案档','⬆ Load an answer file')}<input type="file" accept=".json,application/json" id="loadall" hidden></label></div>
+    </div>
+    <div class="btn-row" style="margin-top:4px"><button type="button" class="btn secondary" id="clearall" style="color:#a33;border-color:#a33;font-size:16px;padding:9px 16px">${T('清除这台电脑上的所有资料','Clear all my information on this computer')}</button></div>
+  </section>
+  <h2>${T('选择要准备的文件','Choose a document')}</h2>
+  <div class="grid">${HOME_ORDER.map(id=>DOCS.find(x=>x.id===id)).map((d,i)=>`<a class="card" href="#${d.id}"><span class="tag">${i+1} · ${t(d.tag)}</span><h3>${t(d.name)}</h3>${LANG==='zh'?`<div class="official">${d.official}</div>`:''}<p>${t(d.card)}</p><span class="go">${T('开始 →','Start →')}</span></a>`).join('')}</div>
+
+  <section class="block">
+    <h2>${T('建议的顺序','Suggested order')}</h2>
+    <ol class="steps-list">${order.map(o=>`<li>${t(o)}</li>`).join('')}</ol>
+  </section>
+
+  <section class="block">
+    <h2>${T('您的情况适合自己办吗？','Can you do this yourself?')}</h2>
+    <p class="small">${T('以下任何一项符合，都建议在签署前咨询康州执业律师。','If any of these apply, we recommend talking with a Connecticut attorney before signing.')}</p>
+    <div class="check-grid" id="screen">${screenItems.map((x,i)=>`<label><input type="checkbox" data-i="${i}"><span>${t(x)}</span></label>`).join('')}</div>
+    <div id="screen-out"></div>
+  </section>
+
+  <section class="block">
+    <h2>${T('常见问题','Frequently asked questions')}</h2>
+    ${LANG==='en' ? `
+    <p><b>Why are the documents in English?</b> Hospitals, banks and courts in Connecticut expect English documents. You can use this site in Chinese, but the legal documents are generated in English. The Final Wishes Letter and Letter of Instruction may be written in any language.</p>
+    <p><b>Is my information safe?</b> Everything is processed and saved in your own browser. This site has no server, no accounts, and collects no data. On a shared computer, use "Clear my answers" on the last step of each document.</p>
+    <p><b>Will the documents be valid?</b> The Advance Directive and Power of Attorney follow Connecticut's statutory forms (§ 19a-575a and § 1-352). Validity depends on signing, witnessing and notarizing correctly — the last page of every PDF explains how.</p>
+    <p><b>Can I make changes later?</b> Yes. Your answers are kept in this browser, and you can also download an answer file to load and edit later.</p>` : `
+    <p><b>为什么文件是英文的？</b>医院、银行和法院只认英文文件。问答过程有中文说明，最后生成的正式文件是英文；"最终意愿信"和"指示信"可以用中文写。</p>
+    <p><b>我的资料安全吗？</b>所有内容都在您自己的浏览器里处理和保存，本网站没有服务器、没有账号，也不收集任何资料。在公共电脑上用完，请点每份文件最后一步的"清除我的答案"。</p>
+    <p><b>生成的文件有效吗？</b>医疗预嘱与财务授权书依照康州法定格式（§ 19a-575a、§ 1-352）。文件是否有效，取决于您是否按"签署说明"正确签名、见证和公证。PDF 最后一页附有签署说明。</p>
+    <p><b>可以以后再修改吗？</b>可以。答案会暂存在本机浏览器里，也可以下载"答案档"，下次载入继续编辑。</p>`}
+  </section>`;
+  DOCS.forEach(d=>{ if(ANSWERS[d.id]) syncShared(d); });
+  { const P = profile(); const pf = $('#pf'); const stepObj = {fields:PROFILE_FIELDS};
+    const draw = () => { pf.innerHTML = PROFILE_FIELDS.map(f=>fieldHTML(f,P)).join(''); bind(pf, stepObj, P, draw); };
+    draw();
+    $('#saveall').onclick = () => { const d=new Date(); const ds=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; saveFile(`PlanAheadCT-all-answers-${ds}.json`, new Blob([JSON.stringify({app:'planahead-ct', v:2, all:true, saved:d.toISOString(), answers:ANSWERS},null,2)],{type:'application/json'})); };
+    $('#loadall').onchange = e => { const file=e.target.files[0]; if(!file) return; const rd=new FileReader(); rd.onload=()=>{ try{ const j=JSON.parse(rd.result);
+        if(j && j.all && j.answers && typeof j.answers==='object'){ ANSWERS = j.answers; }
+        else if(j && j.doc && DOCS.find(x=>x.id===j.doc)){ ANSWERS[j.doc] = j.answers||{}; }
+        else throw new Error(T('这不是本网站的答案档。','This is not an answer file from this site.'));
+        persist(); renderHome(); toast(T('答案已载入。','Answers loaded.')); }catch(err){ toast(T('无法载入：','Could not load: ')+err.message); } }; rd.readAsText(file); };
+    $('#clearall').onclick = () => { const b=$('#clearall'); if(b.dataset.c){ ANSWERS = {}; persist(); renderHome(); toast(T('已清除这台电脑上的所有资料。','All your information on this computer was cleared.')); } else { b.dataset.c='1'; b.textContent=T('再按一次确认清除全部','Click again to clear everything'); } };
+  }
+  app.querySelectorAll('#screen input').forEach(cb=>cb.addEventListener('change',()=>{
+    const n = app.querySelectorAll('#screen input:checked').length;
+    $('#screen-out').innerHTML = n ? `<div class="callout">${T(`您勾选了 ${n} 项。这些情况通常需要更周全的安排，例如设立信托、处理税务或跨境资产。<b>建议签署前先咨询康州执业律师。</b>本网站的文件仍可作为您和律师讨论的起点。`, `You checked ${n} item${n>1?'s':''}. Situations like these often call for more careful planning — trusts, tax planning or cross-border assets. <b>Please consult a Connecticut attorney before signing.</b> The documents here can still be a useful starting point for that conversation.`)}</div>` : '';
+  }));
+}
+
+function visibleFields(step, a){ return step.fields.filter(f=>!f.show || f.show(a)); }
+
+function renderDoc(d){
+  CUR_DOC = d;
+  const app = $('#app');
+  const a = syncShared(d);
+  const S = d.steps.length;
+  const crumb = `<div class="crumb"><a href="#home">${T('← 全部文件','← All documents')}</a> &nbsp;/&nbsp; ${t(d.name)}</div>`;
+  if(VIEW.step === -1){
+    const i = d.intro;
+    app.innerHTML = crumb + `
+    <h1>${t(d.name)}</h1>
+    ${LANG==='zh'?`<p class="official-h">英文正式名称：${d.official}</p>`:''}
+    ${d.statute?`<p class="stepmeta">${T('依据','Based on')}: ${d.statute}</p>`:''}
+    <section class="block"><h3>${T('这份文件的作用','What this document does')}</h3><p>${t(i.purpose)}</p></section>
+    <section class="block"><h3>${T('谁需要','Who needs it')}</h3><p>${t(i.who)}</p></section>
+    <section class="block"><h3>${T('生成 PDF 后，怎样让它生效','After you download the PDF: how to make it effective')}</h3><ol class="steps-list">${i.effective.map(e=>`<li>${t(e)}</li>`).join('')}</ol></section>
+    <section class="block"><h3>${T('开始前请准备','Before you start')}</h3><ul>${i.need.map(n=>`<li>${t(n)}</li>`).join('')}</ul>
+      <div class="btn-row"><button class="btn accent" id="start">${Object.keys(a).length?T('继续填写 →','Continue →'):T('开始填写 →','Start →')}</button>
+      <label class="btn secondary" style="cursor:pointer">${T('载入答案档','Load an answer file')}<input type="file" accept=".json,application/json" id="load" hidden></label></div>
+    </section>`;
+    $('#start').onclick = ()=>{ VIEW.step=0; renderDoc(d); window.scrollTo(0,0); };
+    $('#load').onchange = e => loadAnswers(e, d);
+    return;
+  }
+  if(VIEW.step >= S){ return renderReview(d); }
+  const step = d.steps[VIEW.step];
+  app.innerHTML = crumb + `
+    <h1 style="font-size:28px">${t(d.name)}${LANG==='zh'?` <span class="official-s">${d.official}</span>`:''}</h1>
+    <div class="progress">${d.steps.map((_,i)=>`<span class="${i<=VIEW.step?'on':''}"></span>`).join('')}<span></span></div>
+    <p class="stepmeta">${T(`第 ${VIEW.step+1} 步，共 ${S} 步`, `Step ${VIEW.step+1} of ${S}`)}</p>
+    <section class="block"><h2>${t(step.title)}</h2><form id="f" novalidate></form>
+      <div class="btn-row"><button class="btn secondary" id="back">${T('← 上一步','← Back')}</button><button class="btn" id="next">${VIEW.step===S-1?T('预览文件 →','Preview →'):T('下一步 →','Next →')}</button></div>
+    </section>`;
+  const form = $('#f');
+  const draw = () => { form.innerHTML = visibleFields(step,a).map(f=>fieldHTML(f,a)).join(''); bind(form, step, a, draw); };
+  draw();
+  $('#back').onclick = e=>{ e.preventDefault(); VIEW.step--; renderDoc(d); window.scrollTo(0,0); };
+  $('#next').onclick = e=>{ e.preventDefault(); if(validate(form, step, a)){ VIEW.step++; renderDoc(d); window.scrollTo(0,0);} };
+}
+
+function fieldHTML(f, a){
+  const nmHint = f.nm ? `<p class="help">${T('请照着驾照或护照上的英文拼法填写，例如：Mei Ling Wang','Spell it exactly as on the driver\'s license or passport, e.g. Mei Ling Wang')}</p>` : '';
+  const sharedNote = f.shared ? `<p class="help" style="color:var(--brand-2)">${T('🔗 与首页"我的基本资料"共用，修改后其他文件会同步。','🔗 Shared with "My basic information" on the home page; changes sync to other documents.')}</p>` : '';
+  const lbl = `<span class="lbl">${t(f.label)}${f.req?' <span style="color:#b42318">*</span>':''}</span>${nmHint}${sharedNote}${f.help?`<p class="help">${t(f.help)}</p>`:''}`;
+  const v = a[f.k];
+  if(f.t==='text' || f.t==='date') return `<div class="field" data-k="${f.k}">${lbl}<input type="${f.t}" name="${f.k}" value="${esc(v||'')}" placeholder="${esc(t(f.ph) || (f.nm?'Mei Ling Wang':''))}"></div>`;
+  if(f.t==='address'){
+    const o = (v && typeof v==='object') ? v : {st: v||''};
+    const sub = (key, zh, en, ph, cls) => `<div class="${cls||''}"><label>${T(zh,en)}</label><input type="text" data-ad="${key}" value="${esc(key==='state' ? (o.state ?? 'CT') : (o[key]||''))}" placeholder="${esc(ph)}"></div>`;
+    return `<div class="field addr" data-k="${f.k}">${lbl}<p class="help">${T('请用英文填写，和信件上的地址一样。','Use the same address you receive mail at.')}</p><div class="addr-grid">${sub('st','门牌号码和街道','Street address','123 Main St, Apt 4','wide')}${sub('city','城市','City','Hartford')}${sub('state','州','State','CT','narrow')}${sub('zip','邮编','ZIP code','06103','narrow')}</div></div>`;
+  }
+  if(f.t==='trtext'){
+    const en = `<textarea name="${f.k}" placeholder="${esc(t(f.ph))}">${esc(v||'')}</textarea>`;
+    if(LANG==='en') return `<div class="field" data-k="${f.k}">${lbl}${en}</div>`;
+    return `<div class="field tr" data-k="${f.k}">${lbl}
+      <div class="tr-grid">
+        <div><label class="tr-l">① 用中文写</label><textarea name="${f.k}_zh" placeholder="请用中文写下您的意思">${esc(a[f.k+'_zh']||'')}</textarea></div>
+        <div class="tr-mid"><button type="button" class="btn secondary tr-btn" data-tr="${f.k}">翻译成英文 →</button><div class="tr-status" id="trs-${f.k}"></div></div>
+        <div><label class="tr-l">② 英文（会写进文件，可以修改）</label>${en}</div>
+      </div>
+      <p class="help tr-warn">⚠️ 机器翻译可能有误。签署前，请懂英文的家人或朋友确认英文意思和您想表达的一致。</p></div>`;
+  }
+  if(f.t==='textarea') return `<div class="field" data-k="${f.k}">${lbl}<textarea name="${f.k}" placeholder="${esc(t(f.ph))}">${esc(v||'')}</textarea></div>`;
+  if(f.t==='radio') return `<div class="field" data-k="${f.k}">${lbl}${f.opts.map(o=>`<label class="opt ${v===o.v?'sel':''}"><input type="radio" name="${f.k}" value="${esc(o.v)}" ${v===o.v?'checked':''}><span>${t(o)}</span></label>`).join('')}</div>`;
+  if(f.t==='checks') { const arr=v||[]; return `<div class="field" data-k="${f.k}">${lbl}${f.opts.map(o=>`<label class="opt ${arr.includes(o.v)?'sel':''}"><input type="checkbox" name="${f.k}" value="${esc(o.v)}" ${arr.includes(o.v)?'checked':''}><span>${t(o)}</span></label>`).join('')}</div>`; }
+  if(f.t==='info') return `<div class="field infobox">${t(typeof f.html==='function' ? f.html(a) : f.html)}</div>`;
+  if(f.t==='matrix'){
+    const m = v || {};
+    const item = it => `<div class="mx ${m[it.v]?'done':''}"><div class="mx-h">${t(it)}</div><div class="mx-d">${t(it.d)}</div><div class="mx-c">${f.choices.map(c=>`<label class="mx-o ${m[it.v]===c.v?'sel':''} mx-${c.v}"><input type="radio" data-m="${f.k}" data-i="${it.v}" name="${f.k}__${it.v}" value="${c.v}" ${m[it.v]===c.v?'checked':''}>${t(c)}</label>`).join('')}</div></div>`;
+    const groups = f.groups || [{v:null}];
+    return `<div class="field" data-k="${f.k}">${lbl}${groups.map(g=>`${g.v?`<div class="mx-g"><div class="mx-gh">${t(g)}</div><div class="mx-gd">${t(g.d)}</div><div class="mx-gs">${T('这一组全部选：','Set this whole group to:')} ${f.choices.map(c=>`<button type="button" class="mx-q" data-grp="${g.v}" data-val="${c.v}">${t(c)}</button>`).join('')}</div></div>`:''}${f.items.filter(it=>!g.v||it.g===g.v).map(item).join('')}`).join('')}</div>`;
+  }
+
+  if(f.t==='rows'){
+    const rows = (v && v.length) ? v : [{}];
+    return `<div class="field rows" data-k="${f.k}">${lbl}${rows.map((r,i)=>`<div class="row" data-i="${i}">${rows.length>1?`<button type="button" class="rm" data-rm="${i}">${T('✕ 删除','✕ Remove')}</button>`:''}<div class="rowgrid">${f.cols.map(c=>`<div><label>${t(c.label)}</label>${c.t==='select'?`<select data-c="${c.k}"><option value=""></option>${c.opts.map(o=>`<option value="${esc(o.v)}" ${r[c.k]===o.v?'selected':''}>${esc(t(o))}</option>`).join('')}</select>`:`<input type="text" data-c="${c.k}" value="${esc(r[c.k]||'')}" placeholder="${esc(t(c.ph))}">`}</div>`).join('')}</div></div>`).join('')}
+      ${rows.length < (f.max||10) ? `<button type="button" class="btn secondary" data-add="1" style="font-size:16px;padding:9px 16px">${T('＋ 再加一行','+ Add a row')}</button>`:''}</div>`;
+  }
+  return '';
+}
+
+function bind(form, step, a, redraw){
+  const sig = () => visibleFields(step,a).map(f=>f.k).join('|');
+  const cur = sig();
+  form.querySelectorAll('input[type=text],input[type=date],textarea').forEach(el=>{ if(el.dataset.c || el.dataset.ad) return; el.addEventListener('input',()=>{ a[el.name]=el.value; if(CUR_DOC) pushShared(CUR_DOC, el.name, el.value); persist(); if(sig()!==cur){ const n=el.name; redraw(); const again=form.querySelector(`[name="${n}"]`); if(again){ again.focus(); try{ const L=again.value.length; again.setSelectionRange(L,L);}catch(e){} } } }); });
+  form.querySelectorAll('input[type=radio]').forEach(el=>el.addEventListener('change',()=>{
+    if(el.dataset.m){ const k=el.dataset.m; a[k]=Object.assign({}, a[k]||{}, {[el.dataset.i]:el.value}); persist();
+      const card=el.closest('.mx'); card.classList.add('done'); card.querySelectorAll('.mx-o').forEach(o=>o.classList.toggle('sel', o.querySelector('input').checked)); return; }
+    a[el.name]=el.value; persist(); redraw(); }));
+  form.querySelectorAll('input[type=checkbox]').forEach(el=>el.addEventListener('change',()=>{ const k=el.name; a[k]=[...form.querySelectorAll(`input[name="${k}"]:checked`)].map(x=>x.value); persist(); redraw(); }));
+  form.querySelectorAll('.field.addr').forEach(box=>{
+    const k=box.dataset.k;
+    const sync=()=>{ const o={}; box.querySelectorAll('[data-ad]').forEach(i=>o[i.dataset.ad]=i.value.trim()?i.value:''); a[k]=o; if(CUR_DOC) pushShared(CUR_DOC, k, o); persist(); };
+    box.querySelectorAll('[data-ad]').forEach(i=>i.addEventListener('input',sync));
+    if(!a[k] || typeof a[k]==='string') sync();
+  });
+  form.querySelectorAll('[data-tr]').forEach(btn=>btn.addEventListener('click', async ()=>{
+    const k=btn.dataset.tr, st=form.querySelector('#trs-'+k), src=form.querySelector(`[name="${k}_zh"]`), dst=form.querySelector(`[name="${k}"]`);
+    if(!src.value.trim()){ st.textContent='请先在左边用中文写下内容。'; return; }
+    btn.disabled=true; st.textContent='正在翻译…';
+    try{ const out = await translateZhEn(src.value, st); dst.value=out; a[k]=out; persist(); st.textContent='✓ 已翻译，请检查右边的英文。'; }
+    catch(e){ st.innerHTML = e && e.message==='slow' ? '翻译模型下载时间较长，请确认网络连线，稍后再按一次。' : e && e.message==='unsupported' ? '这个浏览器不支持内置翻译。请用<b>电脑版 Chrome</b>（138 版或更新）打开本网站，或请懂英文的家人帮忙在右边填写英文。' : '翻译失败：'+esc(e && e.message || e); }
+    finally{ btn.disabled=false; }
+  }));
+  form.querySelectorAll('.mx-q').forEach(btn=>btn.addEventListener('click',()=>{
+    const f = step.fields.find(x=>x.t==='matrix'); const m = Object.assign({}, a[f.k]||{});
+    f.items.filter(it=>it.g===btn.dataset.grp).forEach(it=>m[it.v]=btn.dataset.val); a[f.k]=m; persist();
+    const y=window.scrollY; redraw(); window.scrollTo(0,y); }));
+  form.querySelectorAll('.rows').forEach(box=>{
+    const k = box.dataset.k;
+    const sync = () => { a[k] = [...box.querySelectorAll('.row')].map(row=>{ const o={}; row.querySelectorAll('[data-c]').forEach(i=>o[i.dataset.c]=i.value); return o; }); persist(); };
+    box.querySelectorAll('[data-c]').forEach(i=>{ i.addEventListener('input', sync); i.addEventListener('change', sync); });
+    const add = box.querySelector('[data-add]'); if(add) add.onclick = ()=>{ sync(); a[k].push({}); persist(); redraw(); };
+    box.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{ sync(); a[k].splice(+b.dataset.rm,1); persist(); redraw(); });
+  });
+}
+
+function isFilled(f, a){
+  const v = a[f.k];
+  if(f.t==='matrix') return f.items.every(it=>(v||{})[it.v]);
+  if(f.t==='info') return true;
+  if(f.t==='address'){ const o=v||{}; return typeof o==='string' ? filled(o) : (filled(o.st)&&filled(o.city)&&filled(o.zip)); }
+  if(f.t==='rows') return (v||[]).some(r=>Object.values(r).some(filled));
+  if(f.t==='checks') return (v||[]).length>0;
+  return filled(v);
+}
+
+function validate(form, step, a){
+  form.querySelectorAll('.err').forEach(e=>e.remove());
+  let ok = true, first=null;
+  visibleFields(step,a).forEach(f=>{
+    if(!f.req || isFilled(f,a)) return;
+    ok=false; const box=form.querySelector(`[data-k="${f.k}"]`);
+    if(box){ box.insertAdjacentHTML('beforeend',`<div class="err">${f.t==='matrix'?T('请为每一项都做出选择','Please make a choice for every treatment'):T('请填写这一项','This field is required')}</div>`); first = first||box; }
+  });
+  if(first) first.scrollIntoView({behavior:'smooth', block:'center'});
+  return ok;
+}
+
+/* ---------- On-device translation (Chrome Translator API); nothing leaves the computer ---------- */
+let _translator = null;
+async function translateZhEn(text, statusEl){
+  if(!('Translator' in self)) throw new Error('unsupported');
+  const opts = {sourceLanguage:'zh', targetLanguage:'en'};
+  const avail = await Translator.availability(opts);
+  if(avail==='unavailable') throw new Error('unsupported');
+  if(!_translator){
+    if(avail!=='available' && statusEl) statusEl.textContent='第一次使用，需要下载翻译模型，请稍候…';
+    try{
+      const creating = Translator.create({...opts, monitor(m){ m.addEventListener('downloadprogress', e=>{ if(statusEl) statusEl.textContent='第一次使用，正在下载翻译模型… '+Math.round((e.loaded||0)*100)+'%'; }); }});
+      _translator = await Promise.race([creating, new Promise((_,rej)=>setTimeout(()=>rej(new Error('slow')), 60000))]);
+    }catch(e){
+      if(e && e.message==='slow') throw e;
+      if(e && (e.name==='NotAllowedError' || e.name==='NotSupportedError')) throw new Error('unsupported');
+      throw e;
+    }
+  }
+  const parts = text.split(/\n/);
+  const out = [];
+  for(const p of parts) out.push(p.trim() ? await _translator.translate(p) : '');
+  return out.join('\n');
+}
+
+/* ---------- Pagination ---------- */
+function paginate(blocks, title, opts={}){
+  const root = $('#render-root'); root.innerHTML='';
+  const pages=[]; let inner;
+  const newPage = () => { const page=document.createElement('div'); page.className='page'+(opts.banner?' tr-page':''); inner=document.createElement('div'); inner.className='inner'; page.appendChild(inner); root.appendChild(page); pages.push(page); };
+  newPage();
+  blocks.forEach((b, idx)=>{
+    if(b === '__PAGEBREAK__'){ if(inner.childNodes.length) newPage(); return; }
+    if(opts.force && opts.force.has(idx) && inner.childNodes.length) newPage();
+    const tmp=document.createElement('div'); tmp.innerHTML=b;
+    const nodes=[...tmp.childNodes]; nodes.forEach(n=>{ n._bi = idx; });
+    nodes.forEach(n=>inner.appendChild(n));
+    if(inner.scrollHeight > inner.clientHeight+1 && inner.childNodes.length > nodes.length){
+      nodes.forEach(n=>n.remove());
+      const old = inner; let carry = [];
+      let last = old.lastElementChild;
+      while(last && last.tagName==='H4' && old.childElementCount>1){ carry.unshift(last); last.remove(); last = old.lastElementChild; }
+      newPage(); carry.forEach(n=>inner.appendChild(n)); nodes.forEach(n=>inner.appendChild(n));
+    }
+  });
+  const starts = pages.map(p=>{ const f = p.querySelector('.inner').firstChild; return f ? f._bi : -1; });
+  pages.forEach((p,i)=>{
+    if(opts.banner){ const bn=document.createElement('div'); bn.className='pbanner'; bn.innerHTML=opts.banner; p.appendChild(bn); }
+    const f=document.createElement('div'); f.className='pfoot';
+    f.innerHTML = opts.banner ? `<span>${esc(title)}</span><span>第 ${i+1} 页，共 ${pages.length} 页 · 对应英文原件第 ${i+1} 页</span>` : `<span>${esc(title)}</span><span>Initials: ________ &nbsp;&nbsp; Page ${i+1} of ${pages.length}</span>`;
+    p.appendChild(f); });
+  pages.starts = starts;
+  return pages;
+}
+
+const DOC_EN_TITLE = {'advance-directive':'Advance Directive','power-of-attorney':'Durable Power of Attorney','hipaa':'HIPAA Authorization','final-wishes':'Letter of Final Wishes','letter-of-instruction':'Letter of Instruction','beneficiary-review':'Beneficiary Review'};
+function buildAll(d){
+  const r = d.build(syncShared(d));
+  return {r, blocks:[...r.blocks, '__PAGEBREAK__', ...r.instructions]};
+}
+const HAS_ZH = id => ['advance-directive','power-of-attorney','hipaa'].includes(id);
+const ZH_TITLE = {'advance-directive':'医疗预嘱','power-of-attorney':'持久财务授权书','hipaa':'病历授权书'};
+const ZH_BANNER = '中文参考译本 · 仅供理解，不具法律效力 · 请签署英文原件<span class="pb-en">Chinese reference translation — not for signing</span>';
+/* Paginate the Chinese translation so each page matches the same page of the English original */
+function paginateTranslation(d){
+  const a = syncShared(d), name = a.name||'';
+  const en = paginate(d.build(a).blocks, `${DOC_EN_TITLE[d.id]} — ${name}`);
+  const force = new Set(en.starts.slice(1).filter(x=>x>=0));
+  return paginate(d.build(a, true).blocks, `中文参考译本 — ${ZH_TITLE[d.id]} — ${name}`, {force, banner:ZH_BANNER});
+}
+
+function renderReview(d){
+  const app = $('#app'), a = syncShared(d);
+  const missing=[];
+  d.steps.forEach((s,si)=>visibleFields(s,a).forEach(f=>{ if(f.req && !isFilled(f,a)) missing.push([si,f]); }));
+  const warns=[];
+  if(d.id==='advance-directive' && filled(a.rep) && a.rep.trim().toLowerCase()===String(a.name||'').trim().toLowerCase()) warns.push(T('医疗代表不能是您本人。','Your health care representative cannot be yourself.'));
+  if(d.id==='advance-directive' && a.lw==='custom' && LS_ITEMS.every(it=>(a.lwItems||{})[it.v]==='yes')) warns.push(T('您在逐项选择中每一项都选了"要"。如果您希望尽量延长生命，可以直接在第 2 步选"尽量延长生命"，文件会更清楚。','You chose "Yes" for every treatment. If you want all life-sustaining treatment, choose "Prolong my life" in step 2 for a clearer document.'));
+  if(d.id==='power-of-attorney' && filled(a.agent1) && filled(a.succ1) && a.agent1.trim().toLowerCase()===a.succ1.trim().toLowerCase()) warns.push(T('后备代理人与代理人是同一人，请确认。','Your successor agent is the same person as your agent — please check.'));
+  const cjk = /[㐀-鿿]/;
+  if(['advance-directive','power-of-attorney','hipaa'].includes(d.id)){
+    const bad = Object.entries(a).filter(([k])=>!k.endsWith('_zh')).map(([,v])=>v).some(v => typeof v==='string' ? cjk.test(v) : Array.isArray(v) && v.some(r=>typeof r==='object' && Object.values(r).some(x=>cjk.test(x||''))));
+    if(bad) warns.push(T('这是正式法律文件，请把所有答案改用<b>英文</b>填写（目前有中文字）。医院和银行可能不接受含中文的文件。','This is a legal document; please answer in <b>English</b> only (Chinese characters were found). Hospitals and banks may not accept it otherwise.'));
+  }
+  app.innerHTML = `<div class="crumb"><a href="#home">${T('← 全部文件','← All documents')}</a> &nbsp;/&nbsp; ${t(d.name)}</div>
+    <h1 style="font-size:28px">${t(d.name)}${T('：预览与生成',': preview and download')}</h1>
+    <div class="progress">${d.steps.map(()=>`<span class="on"></span>`).join('')}<span class="on"></span></div>
+    ${missing.length?`<div class="callout"><b>${T(`还有 ${missing.length} 项必填内容未完成：`,`${missing.length} required item${missing.length>1?'s are':' is'} still missing:`)}</b><br>${missing.map(([si,f])=>`<a href="#" data-go="${si}">${T(`第 ${si+1} 步`,`Step ${si+1}`)}: ${strip(t(f.label))}</a>`).join('<br>')}</div>`:''}
+    ${warns.map(w=>`<div class="callout">⚠️ ${w}</div>`).join('')}
+    <section class="block">
+      <div class="btn-row" style="margin-top:0">
+        <button class="btn accent" id="pdf" ${missing.length?'disabled':''}>${T('⬇ 生成 PDF（英文原件）','⬇ Download PDF')}</button>
+        ${LANG==='zh' && HAS_ZH(d.id) ? `<button class="btn" id="pdfzh" ${missing.length?'disabled':''}>⬇ 中文参考译本 PDF</button>` : ''}
+        <button class="btn secondary" id="edit">${T('← 返回修改','← Edit answers')}</button>
+        <button class="btn secondary" id="save">${T('保存答案档 (.json)','Save answer file (.json)')}</button>
+        <button class="btn secondary" id="clear" style="color:#a33;border-color:#a33">${T('清除我的答案','Clear my answers')}</button>
+      </div>
+      <p class="small" style="margin-top:10px;color:var(--muted)">${T('PDF 在您的电脑上生成。最后一页是中英文签署说明。','The PDF is generated on your device. The last page contains signing instructions.')}</p>
+    </section>
+    <h3>${T('文件预览','Preview')}</h3>
+    ${LANG==='zh' && HAS_ZH(d.id) ? `<div class="pv-tabs"><button type="button" data-pv="en" class="${PV_MODE!=='zh'?'on':''}">英文原件（签署用）</button><button type="button" data-pv="zh" class="${PV_MODE==='zh'?'on':''}">中文参考译本（对照阅读）</button></div><p class="small" style="color:var(--muted);margin:-4px 0 10px">中文译本和英文原件逐页对应：中文第 3 页就是英文第 3 页的意思。只有英文原件可以签署生效。</p>` : ''}
+    <div class="preview-wrap" id="pv"></div>`;
+  app.querySelectorAll('[data-go]').forEach(x=>x.onclick=e=>{e.preventDefault(); VIEW.step=+x.dataset.go; renderDoc(d);});
+  $('#edit').onclick=()=>{ VIEW.step=d.steps.length-1; renderDoc(d); };
+  $('#save').onclick=()=>saveFile(`${d.id}-answers.json`, new Blob([JSON.stringify({doc:d.id, v:1, answers:a},null,2)],{type:'application/json'}));
+  $('#clear').onclick=()=>{ const b=$('#clear'); if(b.dataset.c){ delete ANSWERS[d.id]; persist(); VIEW.step=-1; renderDoc(d); toast(T('已清除这份文件的答案。','Your answers for this document were cleared.')); } else { b.dataset.c='1'; b.textContent=T('再按一次确认清除','Click again to confirm'); } };
+  $('#pdf').onclick=()=>makePDF(d);
+  if($('#pdfzh')) $('#pdfzh').onclick=()=>makePDF(d, true);
+  if(!(LANG==='zh' && HAS_ZH(d.id))) PV_MODE='en';
+  app.querySelectorAll('[data-pv]').forEach(b=>b.onclick=()=>{ PV_MODE=b.dataset.pv; app.querySelectorAll('[data-pv]').forEach(x=>x.classList.toggle('on', x===b)); drawPreview(d); });
+  drawPreview(d);
+}
+
+let PV_MODE = 'en';
+async function drawPreview(d){
+  const pv = $('#pv'); if(!pv) return;
+  try { await document.fonts.ready; } catch(e){}
+  let pages;
+  if(PV_MODE==='zh' && HAS_ZH(d.id)) pages = paginateTranslation(d);
+  else { const {blocks} = buildAll(d); pages = paginate(blocks, `${DOC_EN_TITLE[d.id]} — ${(ANSWERS[d.id]||{}).name||''}`); }
+  const scale = Math.min(1, (pv.clientWidth-36)/816);
+  pv.innerHTML='';
+  pages.forEach(p=>{ const h=document.createElement('div'); h.className='pv-holder'; h.style.width=(816*scale)+'px'; h.style.height=(1056*scale)+'px'; const c=p.cloneNode(true); c.style.transform=`scale(${scale})`; h.appendChild(c); pv.appendChild(h); });
+  $('#render-root').innerHTML='';
+}
+
+async function makePDF(d, zh=false){
+  const btn = zh ? $('#pdfzh') : $('#pdf'); const label=btn.textContent; btn.disabled=true; btn.textContent=T('正在生成…','Generating…');
+  try{
+    if(!window.jspdf || !window.html2canvas) throw new Error(T('PDF 组件没有载入，请检查网络后重新整理页面。','The PDF library did not load. Check your connection and reload the page.'));
+    await document.fonts.ready;
+    const {r, blocks} = buildAll(d);
+    const name = (ANSWERS[d.id]||{}).name||'';
+    const pages = zh ? paginateTranslation(d) : paginate(blocks, `${DOC_EN_TITLE[d.id]} — ${name}`);
+    const pdf = new window.jspdf.jsPDF({unit:'pt', format:'letter', compress:true});
+    for(let i=0;i<pages.length;i++){
+      btn.textContent=`${T('正在生成…','Generating…')} ${i+1}/${pages.length}`;
+      const canvas = await window.html2canvas(pages[i], {scale:2.2, backgroundColor:'#ffffff', logging:false, useCORS:true});
+      if(i) pdf.addPage('letter','portrait');
+      pdf.addImage(canvas.toDataURL('image/jpeg',0.9),'JPEG',0,0,612,792,undefined,'FAST');
+    }
+    pdf.setProperties({title:`${DOC_EN_TITLE[d.id]} - ${name}`, creator:'Plan Ahead CT (self-help tool)'});
+    const safe = name.replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-');
+    await saveFile(`${r.file}${safe?'-'+safe:''}${zh?'-Chinese-Reference':''}.pdf`, pdf.output('blob'));
+  }catch(e){ console.error(e); toast(T('生成失败：','Could not generate: ')+(e.message||e)); }
+  finally{ btn.disabled=false; btn.textContent=label; $('#render-root').innerHTML=''; }
+}
+
+async function saveFile(filename, blob){
+  // Inside a Claude artifact use the downloads capability; elsewhere a normal browser download.
+  if(window.claude && typeof window.claude.use==='function'){
+    try{
+      const dl = await window.claude.use('downloads');
+      if(dl){ await dl.save({filename, data:blob}); toast(T('已保存：','Saved: ')+filename); return; }
+    }catch(e){
+      if(e && e.code==='declined'){ toast(T('已取消下载。','Download cancelled.')); return; }
+      if(e && e.code==='rate_limited'){ toast(T('请稍候再试。','Please wait a moment and try again.')); return; }
+    }
+  }
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a'); link.href=url; link.download=filename; document.body.appendChild(link); link.click(); link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 4000);
+  toast(T('已下载：','Downloaded: ')+filename);
+}
+
+function loadAnswers(e, d){
+  const file = e.target.files[0]; if(!file) return;
+  const rd = new FileReader();
+  rd.onload = () => { try{ const j=JSON.parse(rd.result); if(j.doc!==d.id){ const o=DOCS.find(x=>x.id===j.doc); throw new Error(T('这个答案档属于另一份文件（'+(o?t(o.name):j.doc)+'）。','This answer file belongs to a different document ('+(o?t(o.name):j.doc)+').')); } ANSWERS[d.id]=j.answers||{}; d.steps.flatMap(st=>st.fields).filter(f=>f.shared && filled(typeof ANSWERS[d.id][f.k]==='object'? (ANSWERS[d.id][f.k]||{}).st : ANSWERS[d.id][f.k])).forEach(f=>profile()[f.shared]=ANSWERS[d.id][f.k]); persist(); VIEW.step=d.steps.length; renderDoc(d); toast(T('答案已载入。','Answers loaded.')); }catch(err){ toast(T('无法载入：','Could not load: ')+err.message); } };
+  rd.readAsText(file);
+}
+
+renderChrome();
+applyFS();
+route();
+</script>
+</body>
+</html>
